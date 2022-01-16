@@ -51,6 +51,9 @@ class BaseAnnotationExperiment(BaseExperiment):
     # --------------------------------------------
 
     def update_rois_image(self, image_id, new_napari_rois):
+        if isinstance(new_napari_rois, list):
+            new_napari_rois = np.array(new_napari_rois)
+
         assert new_napari_rois.ndim == 3
         assert new_napari_rois.shape[1] == 4 and new_napari_rois.shape[2] == 2, "ROI array does not have the correct shape"
         nb_added_rois = new_napari_rois.shape[0]
@@ -96,7 +99,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         rois_ids = self._get_roi_ids_by_image_id(image_id)
         # Check if there are ROIs at all:
         if len(rois_ids):
-            return self._napari_rois[rois_ids]
+            return [roi for roi in self._napari_rois[rois_ids]]
         else:
             return None
 

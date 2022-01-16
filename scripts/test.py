@@ -52,7 +52,7 @@ id_new_image = annotation_exp.add_input_image(main_image_path,
 
 napari_rois = annotation_exp.get_napari_roi_by_image_id(id_new_image)
 
-annotation_exp.get_image_paths(0)
+paths = annotation_exp.get_image_paths(0)
 
 input_images_with_nb_rois = annotation_exp.get_list_rois_per_image()
 
@@ -63,6 +63,8 @@ annotation_exp.update_rois_image(id_new_image, fake_rois)
 # Now update them:
 new_fake_rois = np.concatenate([fake_rois[1:], np.random.uniform(size=(1,4,2))], axis=0)
 annotation_exp.update_rois_image(id_new_image, new_fake_rois)
+napari_rois = annotation_exp.get_napari_roi_by_image_id(1)
+
 print(input_images_with_nb_rois)
 
 
