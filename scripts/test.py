@@ -63,14 +63,8 @@ napari_rois = annotation_exp.get_napari_roi_by_image_id(id_new_image)
 
 roi_paths = annotation_exp.get_training_image_paths(2)
 
-from segmfriends.io.images import read_uint8_img
-read_uint8_img(roi_paths["composite_image"])
-
-# create the viewer and display the image
-viewer = napari.Viewer()
-
-composite_image = read_uint8_img(roi_paths["composite_image"])
-
+from annotationtools.io import dir_dialog
+test = dir_dialog.gui_fname()
 
 
 # -------------------

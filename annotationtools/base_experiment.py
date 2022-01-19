@@ -404,6 +404,11 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         return out_dict
 
+    def update_roi_labels(self, roi_id, roi_labels):
+        roi_info = self.get_training_image_paths(roi_id)
+        write_image_to_file(roi_info["label_image"], roi_labels)
+
+
     # --------------------------------------------
     # Internal methods:
     # --------------------------------------------
