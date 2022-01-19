@@ -3,11 +3,13 @@ import math
 import os
 import numpy as np
 
+from segmfriends.io.images import read_uint8_img, write_image_to_file
 from speedrun import BaseExperiment
 from shutil import copyfile
 
 import pandas
 from segmfriends.utils import readHDF5, writeHDF5, check_dir_and_create
+
 
 # TODO: get list of images and rois per image
 #   check if number of channels are consistent...?
@@ -32,8 +34,6 @@ class BaseAnnotationExperiment(BaseExperiment):
         # Load config and setup:
         self.auto_setup(update_git_revision=False)
 
-        self.create_directories()
-
         # Set default values:
         if not load_prev_experiment:
             self.set("max_nb_extra_channels", 2)
@@ -45,7 +45,6 @@ class BaseAnnotationExperiment(BaseExperiment):
         self._init_rois()
         self._init_input_images_df()
 
-
     # --------------------------------------------
     # ROIs:
     # --------------------------------------------
@@ -55,7 +54,8 @@ class BaseAnnotationExperiment(BaseExperiment):
             new_napari_rois = np.array(new_napari_rois)
 
         assert new_napari_rois.ndim == 3
-        assert new_napari_rois.shape[1] == 4 and new_napari_rois.shape[2] == 2, "ROI array does not have the correct shape"
+        assert new_napari_rois.shape[1] == 4 and new_napari_rois.shape[
+            2] == 2, "ROI array does not have the correct shape"
         nb_added_rois = new_napari_rois.shape[0]
 
         # Get IDs of previous ROIs:
@@ -74,10 +74,13 @@ class BaseAnnotationExperiment(BaseExperiment):
         self._napari_rois = np.concatenate([self._napari_rois, new_napari_rois[rois_not_already_in_project]])
         for i in range(current_max_roi_id, current_max_roi_id + rois_not_already_in_project.sum()):
             self._rois_df.loc[i] = [i, image_id]
+            self._create_training_images([i])
 
         # Remove ROIs that are not present anymore:
         old_rois_to_be_deleted = ~ np.any(check_rois, axis=0)
-        self._delete_roi_ids(list(np.array(prev_roi_ids)[old_rois_to_be_deleted]))
+        old_rois_to_be_deleted = list(np.array(prev_roi_ids)[old_rois_to_be_deleted])
+        self._delete_training_images(old_rois_to_be_deleted)
+        self._delete_roi_ids(old_rois_to_be_deleted)
 
         # Update saved files:
         self.dump_rois()
@@ -103,10 +106,16 @@ class BaseAnnotationExperiment(BaseExperiment):
         else:
             return None
 
+    def get_image_id_from_roi_id(self, roi_id):
+        df = self._rois_df
+        image_id = df.loc[df["roi_id"] == roi_id, "image_id"].tolist()
+        assert len(image_id) == 1
+        return image_id[0]
 
     def _get_roi_ids_by_image_id(self, image_id):
         df = self._rois_df
         rois_ids = df.loc[df["image_id"] == image_id, "roi_id"].tolist()
+
         return rois_ids
 
     def _delete_roi_ids(self, roi_ids):
@@ -116,10 +125,12 @@ class BaseAnnotationExperiment(BaseExperiment):
         df = self._rois_df
         self._rois_df = df[~df['roi_id'].isin(roi_ids)]
 
+        # TODO Delete also files!
+
     def _init_rois(self):
         if self._rois_df is None:
-            rois_csv_path = os.path.join(self.experiment_directory, "rois/rois.csv")
-            rois_hdf5_path = os.path.join(self.experiment_directory, "rois/rois.hdf5")
+            rois_csv_path = os.path.join(self.experiment_directory, "ROIs/rois.csv")
+            rois_hdf5_path = os.path.join(self.experiment_directory, "ROIs/rois.hdf5")
             if os.path.exists(rois_csv_path):
                 self._rois_df = pandas.read_csv(rois_csv_path)
                 assert os.path.exists(rois_hdf5_path), "ROIs hdf5 file not found!"
@@ -135,7 +146,7 @@ class BaseAnnotationExperiment(BaseExperiment):
     def dump_rois(self):
         # Get paths:
         proj_dir = self.experiment_directory
-        rois_dir_path = os.path.join(proj_dir, "rois")
+        rois_dir_path = os.path.join(proj_dir, "ROIs")
         roi_csv_path = os.path.join(rois_dir_path, "rois.csv")
         rois_hdf5_path = os.path.join(rois_dir_path, "rois.hdf5")
 
@@ -173,7 +184,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
         out_dict = {}
         for i in range(2 + self.get("max_nb_extra_channels")):
-            path = image_data.iloc[0, i+1]
+            path = image_data.iloc[0, i + 1]
             if isinstance(path, str):
                 out_dict[ch_names[i]] = path
         return out_dict
@@ -244,11 +255,10 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         return added_image_id
 
-
     def dump_input_images_info(self):
         # Write data to file:
         proj_dir = self.experiment_directory
-        rois_dir_path = os.path.join(proj_dir, "rois")
+        rois_dir_path = os.path.join(proj_dir, "ROIs")
         input_images_csv_path = os.path.join(rois_dir_path, "input_images.csv")
         self._input_images_df.to_csv(input_images_csv_path, index=False)
 
@@ -261,10 +271,9 @@ class BaseAnnotationExperiment(BaseExperiment):
         nb_input_images = self._input_images_df["image_id"].max()
         return 0 if math.isnan(nb_input_images) else nb_input_images + 1
 
-
     def _init_input_images_df(self):
         if self._input_images_df is None:
-            input_images_csv_path = os.path.join(self.experiment_directory, "rois/input_images.csv")
+            input_images_csv_path = os.path.join(self.experiment_directory, "ROIs/input_images.csv")
             if os.path.exists(input_images_csv_path):
                 self._input_images_df = pandas.read_csv(input_images_csv_path, index_col=None)
                 # TODO: remove image_id...?
@@ -280,22 +289,151 @@ class BaseAnnotationExperiment(BaseExperiment):
                 self._input_images_df = pandas.DataFrame(columns=columns_names)
 
     # --------------------------------------------
+    # Image crops defined from ROIs and used for training:
+    # --------------------------------------------
+    def _create_training_images(self, list_roi_ids):
+        """
+        Create the actual cropped images that will be used for training and for annotation.
+        """
+        if not isinstance(list_roi_ids, (list, tuple)):
+            list_roi_ids = [list_roi_ids]
+
+        for roi_id in list_roi_ids:
+            img_id = self.get_image_id_from_roi_id(roi_id)
+            image_paths = self.get_image_paths(img_id)
+            crop_slice = self.get_crop_slice_from_roi_id(roi_id)
+            roi_paths = self.get_training_image_paths(roi_id)
+
+            # Load channels and apply crops:
+            img_channels = []
+            ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
+            for i in range(2 + self.get("max_nb_extra_channels")):
+                if ch_names[i] in image_paths:
+                    img_channels.append(read_uint8_img(image_paths[ch_names[i]])[crop_slice])
+
+            # ----------------------------
+            # Cellpose training image:
+            # ----------------------------
+            # Set green channel as main channel:
+            cellpose_image = np.zeros_like(img_channels[0])
+            cellpose_image[..., 1] = img_channels[0][..., 0]
+
+            # Set red channel as DAPI:
+            if self.use_dapi_channel_for_segmentation:
+                cellpose_image[..., 2] = img_channels[1][..., 0]
+
+            # Apply crop and write image:
+            write_image_to_file(roi_paths["cellpose_training_image"], cellpose_image)
+
+            # ----------------------------
+            # Write composite and single-channel cropped images:
+            # ----------------------------
+            composite_image = np.concatenate([ch_image[..., [0]] for ch_image in img_channels], axis=2)
+            write_image_to_file(roi_paths["composite_image"], composite_image)
+            for i, ch_image in enumerate(img_channels):
+                write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
+
+    def _delete_training_images(self, list_roi_ids):
+        """
+        Delete cropped images (apart from labels)
+        """
+        if not isinstance(list_roi_ids, (list, tuple)):
+            list_roi_ids = [list_roi_ids]
+
+        for roi_id in list_roi_ids:
+            roi_paths = self.get_training_image_paths(roi_id)
+            os.remove(roi_paths["cellpose_training_image"])
+            os.remove(roi_paths["composite_image"])
+            for ch_name in roi_paths["single_channels"]:
+                os.remove(roi_paths["single_channels"][ch_name])
+
+
+    def get_crop_slice_from_roi_id(self, roi_id):
+        self.assert_roi_id(roi_id)
+        roi = self._napari_rois[roi_id]
+        x_crop = slice(int(roi[:, 0].min()), int(roi[:, 0].max()))
+        y_crop = slice(int(roi[:, 1].min()), int(roi[:, 1].max()))
+        return (x_crop, y_crop)
+
+    def assert_roi_id(self, roi_id):
+        assert np.array(self._rois_df['roi_id'].isin([roi_id])).sum() == 1, "ROI id not found"
+
+    def get_roi_list(self):
+        roi_list = []
+        for image_id in range(self.nb_input_images):
+            rois_image = self._get_roi_ids_by_image_id(image_id)
+            for i_roi, roi_id in enumerate(rois_image):
+                out_roi_info = {}
+                out_roi_info['roi_id'] = roi_id
+                out_roi_info['image_id'] = image_id
+                roi_info = self.get_training_image_paths(roi_id)
+                out_roi_info['has_label'] = roi_info["has_labels"]
+                out_roi_info['roi_index_per_image'] = i_roi
+                roi_list.append(out_roi_info)
+        return roi_list
+
+    def get_training_image_paths(self, roi_id):
+        """
+        For a given ROI id, the function returns paths to the training image used by cellpose,
+        the label file with created annotations, and cropped images (both in single-channel and composite versions)
+        that are usually used for annotation.
+        """
+        self.assert_roi_id(roi_id)
+        filename_roi_id = "{:04d}".format(roi_id)
+
+        base_ann_dir = os.path.join(self.experiment_directory, "Annotations")
+        label_image_path = os.path.join(base_ann_dir, "labels/{}.tif".format(filename_roi_id))
+        # Add main paths to crop images:
+        out_dict = {
+            "cellpose_training_image": os.path.join(self.experiment_directory,
+                                                    "Cellpose/cellpose_training_images/{}.tif".format(filename_roi_id)),
+            "composite_image": os.path.join(base_ann_dir, "input_images/composite/{}.tif".format(filename_roi_id)),
+            "label_image": label_image_path,
+            "has_labels": os.path.exists(label_image_path),
+            "single_channels": {}
+        }
+
+        # Add paths to single-channel crop images:
+        ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
+        for i in range(2 + self.get("max_nb_extra_channels")):
+            path = self._input_images_df.iloc[0, i + 1]
+            # Check if channel is present, then add:
+            if isinstance(path, str):
+                out_dict["single_channels"][ch_names[i]] = \
+                    os.path.join(base_ann_dir, "input_images/single_channels/{}_ch{}.tif".format(filename_roi_id, i))
+
+        return out_dict
+
+    # --------------------------------------------
     # Internal methods:
     # --------------------------------------------
     @property
     def use_dapi_channel_for_segmentation(self):
         return self.get("training/use_dapi_channel_for_segmentation")
 
-
     @use_dapi_channel_for_segmentation.setter
     def use_dapi_channel_for_segmentation(self, use_dapi_channel_for_segmentation):
         assert isinstance(use_dapi_channel_for_segmentation, bool)
         self.set("training/use_dapi_channel_for_segmentation", use_dapi_channel_for_segmentation)
 
-    def create_directories(self):
-        check_dir_and_create(os.path.join(self.experiment_directory, "rois"))
-
     def record_args(self):
         # Simulate sys.argv, so that configuration is loaded from the experiment directory:
         self._argv = self._simulated_sys_argv
         return self
+
+    @property
+    def experiment_directory(self):
+        """Directory for the experiment."""
+        return self._experiment_directory
+
+    @experiment_directory.setter
+    def experiment_directory(self, value):
+        if value is not None:
+            # Make directories
+            os.makedirs(os.path.join(value, 'Configurations'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'ROIs'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Annotations/input_images/single_channels'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Annotations/labels'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Cellpose/cellpose_training_images'), exist_ok=True)
+            self._experiment_directory = value

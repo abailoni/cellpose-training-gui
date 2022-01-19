@@ -39,6 +39,9 @@ extra_ch_2_name = "Extra channel 2"
 
 # ---------------------  TO BE FILLED BY USER - END  ------------------------------
 
+# -------------------
+# Add new image:
+# -------------------
 annotation_exp.use_dapi_channel_for_segmentation = use_dapi_channel_for_segmentation
 annotation_exp.set_extra_channels_names([extra_ch_1_name, extra_ch_2_name])
 id_new_image = annotation_exp.add_input_image(main_image_path,
@@ -49,23 +52,45 @@ id_new_image = annotation_exp.add_input_image(main_image_path,
                                filter_extra_ch_1,
                                extra_ch_2_image_path,
                                filter_extra_ch_2)
-
-napari_rois = annotation_exp.get_napari_roi_by_image_id(id_new_image)
+input_images_with_nb_rois = annotation_exp.get_list_rois_per_image()
 
 paths = annotation_exp.get_image_paths(0)
 
-input_images_with_nb_rois = annotation_exp.get_list_rois_per_image()
+# -------------------
+# Get existing ROIs:
+# -------------------
+napari_rois = annotation_exp.get_napari_roi_by_image_id(id_new_image)
 
-import numpy as np
-fake_rois = np.random.uniform(size=(4,4,2))
-annotation_exp.update_rois_image(id_new_image, fake_rois)
+roi_paths = annotation_exp.get_training_image_paths(2)
 
-# Now update them:
-new_fake_rois = np.concatenate([fake_rois[1:], np.random.uniform(size=(1,4,2))], axis=0)
-annotation_exp.update_rois_image(id_new_image, new_fake_rois)
-napari_rois = annotation_exp.get_napari_roi_by_image_id(1)
+from segmfriends.io.images import read_uint8_img
+read_uint8_img(roi_paths["composite_image"])
 
-print(input_images_with_nb_rois)
+# create the viewer and display the image
+viewer = napari.Viewer()
+
+composite_image = read_uint8_img(roi_paths["composite_image"])
+
+
+
+# -------------------
+# Create crops:
+# -------------------
+# annotation_exp._create_training_images(1)
+
+
+# -------------------
+# # Add some ROIs:
+# -------------------
+# import numpy as np
+# fake_rois = np.random.uniform(size=(4,4,2))
+# annotation_exp.update_rois_image(id_new_image, fake_rois)
+#
+# # Now update them:
+# new_fake_rois = np.concatenate([fake_rois[1:], np.random.uniform(size=(1,4,2))], axis=0)
+# annotation_exp.update_rois_image(id_new_image, new_fake_rois)
+
+
 
 
 
