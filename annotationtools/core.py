@@ -3,9 +3,12 @@ import math
 import os
 import numpy as np
 
+from annotationtools.gui_widgets.start_window import StartWindow
 from segmfriends.io.images import read_uint8_img, write_image_to_file
 from speedrun import BaseExperiment
 from shutil import copyfile
+
+import magicgui.widgets as widgets
 
 import pandas
 from segmfriends.utils import readHDF5, writeHDF5, check_dir_and_create
@@ -18,6 +21,8 @@ from segmfriends.utils import readHDF5, writeHDF5, check_dir_and_create
 
 class BaseAnnotationExperiment(BaseExperiment):
     def __init__(self, experiment_directory):
+        self._main_window = None
+        assert isinstance(experiment_directory, str)
         super(BaseAnnotationExperiment, self).__init__(experiment_directory)
 
         # TODO: leave possibility to load initial configs...?
@@ -37,13 +42,32 @@ class BaseAnnotationExperiment(BaseExperiment):
         # Set default values:
         if not load_prev_experiment:
             self.set("max_nb_extra_channels", 2)
-            self.set("extra_channels_names", ["Extra channel 1", "Extra channel 2"])
+            self.set("extra_channels_names", ["Extra ch. 1", "Extra ch. 2"])
 
         # Initialize or load dataframes:
         self._rois_df = None
         self._input_images_df = None
         self._init_rois()
         self._init_input_images_df()
+
+    def run(self):
+        self.show_start_page()
+
+    def show_start_page(self):
+        self.main_window.show()
+        # self.main_window.clear()
+        # self.main_window.append(StartWindow(self))
+        # self.main_window.render()
+        # self.main_window.show()
+
+    @property
+    def main_window(self):
+        if self._main_window is None:
+            # self._main_window = widgets.Container(widgets=[StartWindow(self)])
+            self._main_window = StartWindow(self)
+            # self._main_window.max_width = 30
+            self._main_window.show(run=True)
+        return self._main_window
 
     # --------------------------------------------
     # ROIs:
@@ -161,6 +185,7 @@ class BaseAnnotationExperiment(BaseExperiment):
     # Input images:
     # --------------------------------------------
     def set_extra_channels_names(self, channels_names):
+        # TODO: deprecate
         if not isinstance(channels_names, list):
             assert isinstance(channels_names, str)
             channels_names = [channels_names]
@@ -171,7 +196,10 @@ class BaseAnnotationExperiment(BaseExperiment):
         self.set("extra_channels_names", new_names)
 
     def get_input_image_id_from_path(self, main_image_path):
-        raise NotImplementedError
+        df = self._input_images_df
+        image_id = df.loc[df["main_path"] == main_image_path, "image_id"].tolist()
+        assert len(image_id) == 1
+        return image_id[0]
 
     def get_image_paths(self, image_id):
         """
@@ -205,6 +233,8 @@ class BaseAnnotationExperiment(BaseExperiment):
         # TODO: add option to remove input image? In that case, I need to update self.nb_input_images
         """
         # TODO: generalize to multiple extra channels
+
+
         assert len(extra_channels_kwargs) == 0, "Extra channels are not supported yet"
 
         # Validate main image path:
@@ -227,9 +257,11 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         # Validate DAPI image:
         dapi_image_path = validate_ch_paths(dapi_path, dapi_filter)
-        if self.get("training/use_dapi_channel_for_segmentation"):
-            assert dapi_image_path is not None, "Missing path of DAPI image. If not available, set `use_dapi_channel_for_segmentation`" \
-                                                "to False."
+
+        # If present, then set up the training to use it (cellpose can still train fine if some of the images do
+        # not have DAPI channel):
+        if dapi_image_path is not None:
+            self.use_dapi_channel_for_segmentation = True
 
         # Validate extra channels:
         extra_ch_1_path = validate_ch_paths(extra_ch_1_path, extra_ch_1_filter)
@@ -304,12 +336,11 @@ class BaseAnnotationExperiment(BaseExperiment):
             crop_slice = self.get_crop_slice_from_roi_id(roi_id)
             roi_paths = self.get_training_image_paths(roi_id)
 
+
             # Load channels and apply crops:
-            img_channels = []
             ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
-            for i in range(2 + self.get("max_nb_extra_channels")):
-                if ch_names[i] in image_paths:
-                    img_channels.append(read_uint8_img(image_paths[ch_names[i]])[crop_slice])
+            img_channels = [read_uint8_img(image_paths[ch_names[i]])[crop_slice] if ch_names[i] in image_paths else None
+                            for i in range(2 + self.get("max_nb_extra_channels"))]
 
             # ----------------------------
             # Cellpose training image:
@@ -319,7 +350,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             cellpose_image[..., 1] = img_channels[0][..., 0]
 
             # Set red channel as DAPI:
-            if self.use_dapi_channel_for_segmentation:
+            if self.use_dapi_channel_for_segmentation and img_channels[1] is not None:
                 cellpose_image[..., 2] = img_channels[1][..., 0]
 
             # Apply crop and write image:
@@ -331,7 +362,8 @@ class BaseAnnotationExperiment(BaseExperiment):
             composite_image = np.concatenate([ch_image[..., [0]] for ch_image in img_channels], axis=2)
             write_image_to_file(roi_paths["composite_image"], composite_image)
             for i, ch_image in enumerate(img_channels):
-                write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
+                if ch_image is not None:
+                    write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
 
     def _delete_training_images(self, list_roi_ids):
         """
@@ -414,7 +446,7 @@ class BaseAnnotationExperiment(BaseExperiment):
     # --------------------------------------------
     @property
     def use_dapi_channel_for_segmentation(self):
-        return self.get("training/use_dapi_channel_for_segmentation")
+        return self.get("training/use_dapi_channel_for_segmentation", False)
 
     @use_dapi_channel_for_segmentation.setter
     def use_dapi_channel_for_segmentation(self, use_dapi_channel_for_segmentation):
