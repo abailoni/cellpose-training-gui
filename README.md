@@ -1,4 +1,4 @@
-# manual_annotation_spacem
+# spacem_annotator
 Tools for annotating images used for SpaceM cell segmentation
 
 Requirements:

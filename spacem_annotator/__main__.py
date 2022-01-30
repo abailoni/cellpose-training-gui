@@ -3,7 +3,7 @@ import argparse
 from magicgui.types import FileDialogMode
 from magicgui.widgets import show_file_dialog
 
-from annotationtools.core import BaseAnnotationExperiment
+from spacem_annotator.core import BaseAnnotationExperiment
 
 
 def main():

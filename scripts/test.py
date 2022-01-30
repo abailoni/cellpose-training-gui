@@ -1,4 +1,4 @@
-from annotationtools.core import BaseAnnotationExperiment
+from spacem_annotator.core import BaseAnnotationExperiment
 
 
 project_directory = "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project"
@@ -63,7 +63,7 @@ napari_rois = annotation_exp.get_napari_roi_by_image_id(id_new_image)
 
 roi_paths = annotation_exp.get_training_image_paths(2)
 
-from annotationtools.io import dir_dialog
+from spacem_annotator.io import dir_dialog
 test = dir_dialog.gui_fname()
 
 

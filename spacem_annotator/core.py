@@ -3,7 +3,7 @@ import math
 import os
 import numpy as np
 
-from annotationtools.gui_widgets.start_window import StartWindow
+from spacem_annotator.gui_widgets.start_window import StartWindow
 from speedrun import BaseExperiment
 from shutil import copyfile
 
