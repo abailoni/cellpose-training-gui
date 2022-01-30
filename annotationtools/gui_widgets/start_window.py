@@ -1,14 +1,8 @@
 import napari
-from magicgui.types import FileDialogMode
 import magicgui.widgets as widgets
 from magicgui.widgets import (
-    CheckBox,
-    ComboBox,
     Container,
-    FloatSlider,
     PushButton,
-    SpinBox,
-    show_file_dialog,
 )
 
 from ..napari_gui.roi_selection import RoiSelectionWidget

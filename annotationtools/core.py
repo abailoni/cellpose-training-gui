@@ -9,13 +9,8 @@ from shutil import copyfile
 
 import pandas
 
-from segmfriends.io.images import read_uint8_img, write_image_to_file
-from segmfriends.utils import readHDF5, writeHDF5
-
-
-# TODO: get list of images and rois per image
-#   check if number of channels are consistent...?
-#
+from .io.images import read_uint8_img, write_image_to_file
+from .io.hdf5 import readHDF5, writeHDF5
 
 
 class BaseAnnotationExperiment(BaseExperiment):
@@ -53,10 +48,6 @@ class BaseAnnotationExperiment(BaseExperiment):
 
     def show_start_page(self):
         self.main_window.show()
-        # self.main_window.clear()
-        # self.main_window.append(StartWindow(self))
-        # self.main_window.render()
-        # self.main_window.show()
 
     @property
     def main_window(self):

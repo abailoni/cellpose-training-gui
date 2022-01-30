@@ -2,20 +2,14 @@ import pathlib
 from pathlib import PosixPath
 import os
 
-import napari
 from magicgui.types import FileDialogMode
 import magicgui.widgets as widgets
 from magicgui.widgets import (
-    CheckBox,
-    ComboBox,
     Container,
-    FloatSlider,
     PushButton,
-    SpinBox,
-    show_file_dialog,
 )
 
-from segmfriends.io.images import read_uint8_img
+from ..io.images import read_uint8_img
 
 
 class RoiSelectionWidget(Container):

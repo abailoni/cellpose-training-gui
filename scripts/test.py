@@ -1,4 +1,4 @@
-from annotationtools.base_experiment import BaseAnnotationExperiment
+from annotationtools.core import BaseAnnotationExperiment
 
 
 project_directory = "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project"

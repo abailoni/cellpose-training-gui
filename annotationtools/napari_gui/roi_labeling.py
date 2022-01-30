@@ -1,23 +1,13 @@
-import pathlib
-from pathlib import PosixPath
-import os
 import imageio
 import numpy as np
 
-import napari
-from magicgui.types import FileDialogMode
 import magicgui.widgets as widgets
 from magicgui.widgets import (
-    CheckBox,
-    ComboBox,
     Container,
-    FloatSlider,
     PushButton,
-    SpinBox,
-    show_file_dialog,
 )
 
-from segmfriends.io.images import read_uint8_img
+from ..io.images import read_uint8_img
 
 
 class RoiLabeling(Container):
@@ -64,6 +54,7 @@ class RoiLabeling(Container):
                                                     annotation_layer.data.astype('uint16'))
 
         close_button = PushButton(name="close_and_go_back", text="Go back to initial window")
+
         @close_button.changed.connect
         def close_viewer_and_go_back():
             self.main_gui.roi_select_viewer.close()
@@ -73,8 +64,6 @@ class RoiLabeling(Container):
         self.extend([save_labels, close_button])
 
         self.load_images_in_viewer()
-
-
 
     def load_images_in_viewer(self):
         viewer = self.main_gui.roi_select_viewer
@@ -98,8 +87,8 @@ class RoiLabeling(Container):
             if roi_paths["single_channels"][name] is not None:
                 image = read_uint8_img(roi_paths["single_channels"][name])
                 viewer.add_image(image[..., 0],
-                             name=name,
-                             colormap=channel_colormaps[i],
+                                 name=name,
+                                 colormap=channel_colormaps[i],
                                  blending="additive")
 
         annotations = imageio.imread(roi_paths["label_image"]) if roi_paths["has_labels"] else np.zeros(
@@ -109,4 +98,3 @@ class RoiLabeling(Container):
         if self.annotation_layer_name in loaded_layer_names:
             layers.remove(self.annotation_layer_name)
         viewer.add_labels(annotations, name=self.annotation_layer_name)
-
