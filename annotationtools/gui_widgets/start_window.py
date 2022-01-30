@@ -12,6 +12,7 @@ from magicgui.widgets import (
 )
 
 from ..napari_gui.roi_selection import RoiSelectionWidget
+from ..napari_gui.roi_labeling import RoiLabeling
 
 
 class StartWindow(Container):
@@ -32,69 +33,17 @@ class StartWindow(Container):
         train_button = PushButton(name="start_training", text="Start training")
         train_button.changed.connect(self.show_training_gui)
 
-        button_container = widgets.Container(layout="horizontal",
+        button_container = widgets.Container(layout="vertical",
                                              widgets=[select_rois_button,
                                                       label_rois_button,
                                                       train_button],
-                                             label="Select one option:"
+                                             # label="Select one option:"
                                              )
 
         self.extend([
             button_container])
 
     def show_roi_selection_gui(self):
-        self.clear()
-
-        buttons_to_show = []
-
-        add_new_image_button = PushButton(name="add_new_image", text="Add new image to project")
-        buttons_to_show.append(add_new_image_button)
-
-        @add_new_image_button.changed.connect
-        def add_new_image():
-            self.setup_roi_selected_gui_napari()
-
-        images_in_project = self.project.get_list_rois_per_image()
-        if len(images_in_project) > 0:
-            image_to_be_updated = widgets.ComboBox(
-                # name="choose_image",
-                label="Images in project:",
-                choices=[image_info[0] for image_info in images_in_project
-                         ],
-                # description=None
-            )
-
-            update_rois_button = PushButton(name="update_rois_in_image",
-                                            text="Update regions of interest for selected image")
-
-            @update_rois_button.changed.connect
-            def update_rois_for_image():
-                # Find the ID of the selected image:
-                image_path = image_to_be_updated.value
-                image_id = self.project.get_input_image_id_from_path(image_path)
-                self.setup_roi_selected_gui_napari(image_id)
-
-            buttons_to_show.append(update_rois_button)
-            self.append(image_to_be_updated)
-
-
-        go_back_button = PushButton(name="go_back", text="Go back")
-        go_back_button.changed.connect(self.show_starting_gui)
-        buttons_to_show.append(go_back_button)
-        button_container = widgets.Container(layout="horizontal",
-                                             widgets=buttons_to_show,
-                                             label="Select one option:"
-                                             )
-
-        self.append(button_container)
-
-    def show_roi_labeling_gui(self):
-        pass
-
-    def show_training_gui(self):
-        pass
-
-    def setup_roi_selected_gui_napari(self, image_id=None):
         # Clear and hide the current GUI interface:
         self.clear()
         self.hide()
@@ -102,6 +51,28 @@ class StartWindow(Container):
         # Create a napari viewer with an additional widget:
         self.roi_select_viewer = viewer = napari.Viewer()
 
-        roi_selection_widget = RoiSelectionWidget(self, image_id)
+        roi_selection_widget = RoiSelectionWidget(self)
         viewer.window.add_dock_widget(roi_selection_widget, area='right',
-                                      name="Image paths")  # Add our gui instance to napari viewer
+                                      name="ROI selection")  # Add our gui instance to napari viewer
+
+
+
+    def show_roi_labeling_gui(self):
+        # FIXME: check if ROIS are more than zero!!
+        rois_list = self.project.get_roi_list()
+        if len(rois_list) == 0:
+            self.show_starting_gui()
+
+        # Clear and hide the current GUI interface:
+        self.clear()
+        self.hide()
+
+        # Create a napari viewer with an additional widget:
+        self.roi_select_viewer = viewer = napari.Viewer()
+
+        roi_labeling_widget = RoiLabeling(self)
+        viewer.window.add_dock_widget(roi_labeling_widget, area='right',
+                                      name="ROI labeling")
+
+    def show_training_gui(self):
+        pass

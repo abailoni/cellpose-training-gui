@@ -20,16 +20,42 @@ from segmfriends.io.images import read_uint8_img
 
 class RoiSelectionWidget(Container):
     def __init__(self,
-                 main_gui: "annotationtools.gui_widgets.start_window.StartWindow",
-                 image_id=None):
+                 main_gui: "annotationtools.gui_widgets.start_window.StartWindow"):
         super(RoiSelectionWidget, self).__init__()
         self.main_gui = main_gui
-        self.image_id = image_id
+        nb_images_in_proj = main_gui.project.nb_input_images
+        self.image_id = None if nb_images_in_proj == 0 else 0
         self.shape_layer = None
         self._setup_gui()
 
     def _setup_gui(self):
         self.clear()
+
+        # ----------------------------
+        # Create combo box to decide which image will be loaded:
+        # ----------------------------
+        nb_images_in_proj = self.main_gui.project.nb_input_images
+
+        current_choice = "Add new image" if self.image_id is None else "Image {}".format(self.image_id+1)
+        self.selected_image = widgets.ComboBox(
+            # name="choose_image",
+            label="Displayed image:",
+            choices=["Image {}".format(i+1) for i in range(nb_images_in_proj)
+                     ] + ["Add new image"],
+            value=current_choice
+            # description=None
+        )
+
+        @self.selected_image.changed.connect
+        def update_selected_image_id():
+            # Find the ID of the selected image:
+            choice = self.selected_image.value
+            self.image_id = None if choice == "Add new image" else int(choice.split(" ")[1]) - 1
+            self._setup_gui()
+
+        # selected_image_container = widgets.Container(widgets=[selected_image])
+        self.append(self.selected_image)
+        self.append(widgets.Container())
 
         # ----------------------------
         # Create interface to enter channels file paths:
@@ -54,7 +80,7 @@ class RoiSelectionWidget(Container):
         )
 
         # Add button to load the channels and save them in the project:
-        load_images_button = PushButton(name="load_images", text="Load/update image channels")
+        load_images_button = PushButton(name="load_images", text="Update Displayed Image Channels")
 
         @load_images_button.changed.connect
         def update_image_paths():
@@ -85,7 +111,6 @@ class RoiSelectionWidget(Container):
         # ----------------------------
         if self.image_id is not None:
             image_paths = self.main_gui.project.get_image_paths(image_id=self.image_id)
-            print(image_paths)
 
             for ch_name, wid in zip(self.channel_names, self.get_list_path_widgets()):
                 if ch_name in image_paths:
@@ -93,34 +118,36 @@ class RoiSelectionWidget(Container):
                     wid.value = path
                     # print(path.resolve().as_posix(), wid.value)
 
-            # Now load images in the viewer:
-            self.load_images_in_viewer()
+        # Now load images in the viewer:
+        self.load_images_in_viewer()
 
         # ----------------------------
         # Add additional buttons:
         # ----------------------------
         # Button to update the ROIs:
-        update_rois_button = PushButton(name="update_rois", text="Update regions of interest")
+        update_rois_button = PushButton(name="update_rois", text="Save Regions of Interest")
 
         @update_rois_button.changed.connect
         def update_rois():
             assert self.image_id is not None
-            shapes = self.shape_layer.data
+            # TODO: create method to get annotation layer
+            idx = self.main_gui.roi_select_viewer.layers.index("Regions of interest")
+            shapes = self.main_gui.roi_select_viewer.layers[idx].data
             if len(shapes):
                 self.main_gui.project.update_rois_image(self.image_id, shapes)
 
-        print(self.image_id)
         if self.image_id is not None:
-            self.append(update_rois_button)
+            self.extend([update_rois_button])
 
         # Button to go back to the main
-        close_button = PushButton(name="close_and_go_back", text="Close viewer and go back")
+        # TODO: when closing napari, show initial window
+        close_button = PushButton(name="close_and_go_back", text="Go back to initial window")
         @close_button.changed.connect
         def close_viewer_and_go_back():
             self.main_gui.roi_select_viewer.close()
             self.main_gui.show()
             self.main_gui.show_starting_gui()
-        self.append(close_button)
+        self.extend([close_button])
 
     def get_path_file(self, real_path):
         assert isinstance(real_path, pathlib.PosixPath)
@@ -153,16 +180,16 @@ class RoiSelectionWidget(Container):
 
 
         # Now load the ROIs:
+        shape_layer_name = "Regions of interest"
+        shape_layer_is_visible = shape_layer_name in loaded_layer_names
+        if shape_layer_is_visible:
+            layers.remove(shape_layer_name)
         if self.image_id is not None:
             napari_rois = self.main_gui.project.get_napari_roi_by_image_id(self.image_id)
+            viewer.add_shapes(data=napari_rois, name=shape_layer_name,
+                                                 shape_type="rectangle", opacity=0.15, edge_color='#fff01dff',
+                                                 face_color='#f9ffbeff')
 
-            if self.shape_layer is None:
-                self.shape_layer = viewer.add_shapes(data=napari_rois, name="Regions of interest",
-                                                     shape_type="rectangle", opacity=0.15, edge_color='#fff01dff',
-                                                     face_color='#f9ffbeff')
-            else:
-                if napari_rois is not None:
-                    self.shape_layer.data = napari_rois
 
     @property
     def channel_names(self):

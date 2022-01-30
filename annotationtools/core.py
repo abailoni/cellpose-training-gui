@@ -4,14 +4,13 @@ import os
 import numpy as np
 
 from annotationtools.gui_widgets.start_window import StartWindow
-from segmfriends.io.images import read_uint8_img, write_image_to_file
 from speedrun import BaseExperiment
 from shutil import copyfile
 
-import magicgui.widgets as widgets
-
 import pandas
-from segmfriends.utils import readHDF5, writeHDF5, check_dir_and_create
+
+from segmfriends.io.images import read_uint8_img, write_image_to_file
+from segmfriends.utils import readHDF5, writeHDF5
 
 
 # TODO: get list of images and rois per image
@@ -25,7 +24,6 @@ class BaseAnnotationExperiment(BaseExperiment):
         assert isinstance(experiment_directory, str)
         super(BaseAnnotationExperiment, self).__init__(experiment_directory)
 
-        # TODO: leave possibility to load initial configs...?
         # Simulate sys.argv, so that configuration is loaded from the experiment directory:
         self._simulated_sys_argv = ["script.py", experiment_directory]
         # Check if this is a new project or if we should load the previous config:
@@ -234,7 +232,6 @@ class BaseAnnotationExperiment(BaseExperiment):
         """
         # TODO: generalize to multiple extra channels
 
-
         assert len(extra_channels_kwargs) == 0, "Extra channels are not supported yet"
 
         # Validate main image path:
@@ -282,8 +279,10 @@ class BaseAnnotationExperiment(BaseExperiment):
             assert id_input_image_to_rewrite < nb_input_images
         added_image_id = nb_input_images if id_input_image_to_rewrite is None else id_input_image_to_rewrite
         self._input_images_df.loc[added_image_id] = [added_image_id] + image_info
-
         self.dump_input_images_info()
+
+        # Refresh all the ROIs, if there were any:
+        self._create_training_images(self._get_roi_ids_by_image_id(added_image_id))
 
         return added_image_id
 
@@ -336,7 +335,6 @@ class BaseAnnotationExperiment(BaseExperiment):
             crop_slice = self.get_crop_slice_from_roi_id(roi_id)
             roi_paths = self.get_training_image_paths(roi_id)
 
-
             # Load channels and apply crops:
             ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
             img_channels = [read_uint8_img(image_paths[ch_names[i]])[crop_slice] if ch_names[i] in image_paths else None
@@ -359,8 +357,9 @@ class BaseAnnotationExperiment(BaseExperiment):
             # ----------------------------
             # Write composite and single-channel cropped images:
             # ----------------------------
-            composite_image = np.concatenate([ch_image[..., [0]] for ch_image in img_channels], axis=2)
-            write_image_to_file(roi_paths["composite_image"], composite_image)
+            image_shape = img_channels[0][..., [0]]
+            # composite_image = np.concatenate([ch_image[..., [0]] for ch_image in img_channels if ch_image is not None], axis=2)
+            # write_image_to_file(roi_paths["composite_image"], composite_image)
             for i, ch_image in enumerate(img_channels):
                 if ch_image is not None:
                     write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
@@ -378,7 +377,6 @@ class BaseAnnotationExperiment(BaseExperiment):
             os.remove(roi_paths["composite_image"])
             for ch_name in roi_paths["single_channels"]:
                 os.remove(roi_paths["single_channels"][ch_name])
-
 
     def get_crop_slice_from_roi_id(self, roi_id):
         self.assert_roi_id(roi_id)
@@ -426,20 +424,22 @@ class BaseAnnotationExperiment(BaseExperiment):
         }
 
         # Add paths to single-channel crop images:
+        image_id = self.get_image_id_from_roi_id(roi_id)
         ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
         for i in range(2 + self.get("max_nb_extra_channels")):
-            path = self._input_images_df.iloc[0, i + 1]
+            path = self._input_images_df.iloc[image_id, i + 1]
             # Check if channel is present, then add:
             if isinstance(path, str):
                 out_dict["single_channels"][ch_names[i]] = \
                     os.path.join(base_ann_dir, "input_images/single_channels/{}_ch{}.tif".format(filename_roi_id, i))
+            else:
+                out_dict["single_channels"][ch_names[i]] = None
 
         return out_dict
 
     def update_roi_labels(self, roi_id, roi_labels):
         roi_info = self.get_training_image_paths(roi_id)
         write_image_to_file(roi_info["label_image"], roi_labels)
-
 
     # --------------------------------------------
     # Internal methods:
