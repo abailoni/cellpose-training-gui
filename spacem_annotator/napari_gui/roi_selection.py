@@ -14,7 +14,7 @@ from ..io.images import read_uint8_img
 
 class RoiSelectionWidget(Container):
     def __init__(self,
-                 main_gui: "annotationtools.gui_widgets.start_window.StartWindow"):
+                 main_gui: "spacem_annotator.gui_widgets.start_window.StartingGUI"):
         super(RoiSelectionWidget, self).__init__()
         self.main_gui = main_gui
         nb_images_in_proj = main_gui.project.nb_input_images
@@ -33,7 +33,7 @@ class RoiSelectionWidget(Container):
         current_choice = "Add new image" if self.image_id is None else "Image {}".format(self.image_id+1)
         self.selected_image = widgets.ComboBox(
             # name="choose_image",
-            label="Displayed image:",
+            label="Shown Image:",
             choices=["Image {}".format(i+1) for i in range(nb_images_in_proj)
                      ] + ["Add new image"],
             value=current_choice
@@ -135,7 +135,7 @@ class RoiSelectionWidget(Container):
 
         # Button to go back to the main
         # TODO: when closing napari, show initial window
-        close_button = PushButton(name="close_and_go_back", text="Go back to initial window")
+        close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
         @close_button.changed.connect
         def close_viewer_and_go_back():
             self.main_gui.roi_select_viewer.close()

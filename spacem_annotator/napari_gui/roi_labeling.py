@@ -12,7 +12,7 @@ from ..io.images import read_uint8_img
 
 class RoiLabeling(Container):
     def __init__(self,
-                 main_gui: "annotationtools.gui_widgets.start_window.StartWindow"):
+                 main_gui: "spacem_annotator.gui_widgets.start_window.StartingGUI"):
         super(RoiLabeling, self).__init__()
         self.roi_id = 0
         self.main_gui = main_gui
@@ -28,7 +28,7 @@ class RoiLabeling(Container):
         rois_list = self.main_gui.project.get_roi_list()
 
         self.roi_to_annotate = widgets.ComboBox(
-            label="Displayed Region of Interest:",
+            label="Shown Region of Interest:",
             choices=[roi_info['roi_id'] for roi_info in rois_list],
             value=self.roi_id
             # description=None
@@ -44,7 +44,7 @@ class RoiLabeling(Container):
         # ----------------------------
         # Add button to save labels:
         # ----------------------------
-        save_labels = PushButton(name="save_labels", text="Save labels")
+        save_labels = PushButton(name="save_labels", text="Save Labels")
 
         @save_labels.changed.connect
         def update_labels():
@@ -53,7 +53,7 @@ class RoiLabeling(Container):
             self.main_gui.project.update_roi_labels(self.roi_id,
                                                     annotation_layer.data.astype('uint16'))
 
-        close_button = PushButton(name="close_and_go_back", text="Go back to initial window")
+        close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
 
         @close_button.changed.connect
         def close_viewer_and_go_back():

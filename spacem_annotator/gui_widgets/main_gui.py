@@ -9,9 +9,9 @@ from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
 
 
-class StartWindow(Container):
-    def __init__(self, annotation_project: "annotationtools.BaseAnnotationExperiment"):
-        super(StartWindow, self).__init__()
+class StartingGUI(Container):
+    def __init__(self, annotation_project: "spacem_annotator.BaseAnnotationExperiment"):
+        super(StartingGUI, self).__init__()
         self.project = annotation_project
         # self.max_width = 200
         self.roi_select_viewer = None
@@ -20,11 +20,11 @@ class StartWindow(Container):
     def show_starting_gui(self):
         self.clear()
 
-        select_rois_button = PushButton(name="select_rois", text="Select regions of interest")
+        select_rois_button = PushButton(name="select_rois", text="Select Regions of Interest")
         select_rois_button.changed.connect(self.show_roi_selection_gui)
-        label_rois_button = PushButton(name="label_rois", text="Label regions of interest")
+        label_rois_button = PushButton(name="label_rois", text="Label Regions of Interest")
         label_rois_button.changed.connect(self.show_roi_labeling_gui)
-        train_button = PushButton(name="start_training", text="Start training")
+        train_button = PushButton(name="start_training", text="Start Training")
         train_button.changed.connect(self.show_training_gui)
 
         button_container = widgets.Container(layout="vertical",

@@ -1,14 +1,13 @@
 import math
-
 import os
-import numpy as np
-
-from spacem_annotator.gui_widgets.start_window import StartWindow
-from speedrun import BaseExperiment
 from shutil import copyfile
 
+import numpy as np
 import pandas
 
+from speedrun import BaseExperiment
+
+from .gui_widgets.main_gui import StartingGUI
 from .io.images import read_uint8_img, write_image_to_file
 from .io.hdf5 import readHDF5, writeHDF5
 
@@ -53,7 +52,7 @@ class BaseAnnotationExperiment(BaseExperiment):
     def main_window(self):
         if self._main_window is None:
             # self._main_window = widgets.Container(widgets=[StartWindow(self)])
-            self._main_window = StartWindow(self)
+            self._main_window = StartingGUI(self)
             # self._main_window.max_width = 30
             self._main_window.show(run=True)
         return self._main_window
@@ -365,7 +364,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         for roi_id in list_roi_ids:
             roi_paths = self.get_training_image_paths(roi_id)
             os.remove(roi_paths["cellpose_training_image"])
-            os.remove(roi_paths["composite_image"])
+            # os.remove(roi_paths["composite_image"])
             for ch_name in roi_paths["single_channels"]:
                 os.remove(roi_paths["single_channels"][ch_name])
 
@@ -403,11 +402,11 @@ class BaseAnnotationExperiment(BaseExperiment):
         filename_roi_id = "{:04d}".format(roi_id)
 
         base_ann_dir = os.path.join(self.experiment_directory, "Annotations")
-        label_image_path = os.path.join(base_ann_dir, "labels/{}.tif".format(filename_roi_id))
+        label_image_path = self.get_label_file_path(roi_id)
         # Add main paths to crop images:
         out_dict = {
             "cellpose_training_image": os.path.join(self.experiment_directory,
-                                                    "Cellpose/cellpose_training_images/{}.tif".format(filename_roi_id)),
+                                                    "Cellpose/training_images/{}.tif".format(filename_roi_id)),
             "composite_image": os.path.join(base_ann_dir, "input_images/composite/{}.tif".format(filename_roi_id)),
             "label_image": label_image_path,
             "has_labels": os.path.exists(label_image_path),
@@ -431,6 +430,9 @@ class BaseAnnotationExperiment(BaseExperiment):
     def update_roi_labels(self, roi_id, roi_labels):
         roi_info = self.get_training_image_paths(roi_id)
         write_image_to_file(roi_info["label_image"], roi_labels)
+
+    def get_label_file_path(self, roi_id):
+        return os.path.join(self.experiment_directory, "Cellpose/training_labels", "{:04d}_masks.tif".format(roi_id))
 
     # --------------------------------------------
     # Internal methods:
@@ -460,8 +462,8 @@ class BaseAnnotationExperiment(BaseExperiment):
             # Make directories
             os.makedirs(os.path.join(value, 'Configurations'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
+            # os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
             os.makedirs(os.path.join(value, 'Annotations/input_images/single_channels'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Annotations/labels'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Cellpose/cellpose_training_images'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Cellpose/training_labels'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Cellpose/training_images'), exist_ok=True)
             self._experiment_directory = value
