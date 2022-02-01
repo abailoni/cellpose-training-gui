@@ -30,7 +30,8 @@ class StartingGUI(Container):
         button_container = widgets.Container(layout="vertical",
                                              widgets=[select_rois_button,
                                                       label_rois_button,
-                                                      train_button],
+                                                      # train_button
+                                                      ],
                                              # label="Select one option:"
                                              )
 
