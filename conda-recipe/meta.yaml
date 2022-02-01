@@ -1,0 +1,41 @@
+package:
+  name: spacem_annotator
+  version: 0.1.0
+
+source:
+  path: ..
+
+build:
+  script: "pip install . --no-deps --ignore-installed --no-cache-dir -vvv"
+  number: 1
+
+requirements:
+  build:
+    - python {{ python }}
+    - pip
+  run:
+    - python {{ python }}
+    - numpy
+    - pandas
+    - scipy
+    - h5py
+    - imageio
+    - opencv
+    - napari
+    - magicgui # Probably already included in napari
+    - pyqt
+    - speedrun
+
+test:
+  imports:
+    - spacem_annotator
+    - spacem_annotator.core
+    - spacem_annotator.napari_gui.roi_selection
+  source_files:
+    - tests/**/*.py
+  commands:
+    - python -m unittest discover -s test -v
+
+about:
+  home: https://github.com/abailoni/spacem_annotator
+  license: MIT

@@ -1,0 +1,17 @@
+name: spacem_annotator
+channels:
+  - abailoni
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - numpy
+  - pandas
+  - scipy
+  - h5py
+  - imageio
+  - opencv
+  - napari
+  - magicgui
+  - pyqt
+  - speedrun
