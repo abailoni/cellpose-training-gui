@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Regions of Interest &mdash; SpaceM Annotator  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Label Regions of Interest" href="label_rois.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> SpaceM Annotator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:
+</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Select Regions of Interest</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-are-regions-of-interest">What are regions of interest?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-select-good-regions-of-interest">How to select good regions of interest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#some-example-cases">Some example cases</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-images-to-the-annotation-project">Adding images to the annotation project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-the-first-image">Adding the first image</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#modify-create-regions-of-interest-in-napari">Modify / create regions of interest in Napari</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#todo">TODO</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="label_rois.html">Label Regions of Interest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">Training cellpose</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SpaceM Annotator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Select Regions of Interest</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/spacem_annotator/select_rois.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="select-regions-of-interest">
+<h1>Select Regions of Interest<a class="headerlink" href="#select-regions-of-interest" title="Permalink to this headline"></a></h1>
+<p>After clinking on <em>“Select Regions of Interest”</em> in the starting window of the annotation tool, a napari viewer will open and let you add images to the project and then select regions of interest.</p>
+<section id="what-are-regions-of-interest">
+<h2>What are regions of interest?<a class="headerlink" href="#what-are-regions-of-interest" title="Permalink to this headline"></a></h2>
+<p>After adding an image to the project, you will need to select one or more region of interests (rectangular boxes) that will indicate the parts of the image that you want to manually annotate and that will be used in the following to train the segmentation algorithm.</p>
+<section id="how-to-select-good-regions-of-interest">
+<h3>How to select good regions of interest<a class="headerlink" href="#how-to-select-good-regions-of-interest" title="Permalink to this headline"></a></h3>
+<p>When you select a region of interest, keep in mind that <strong>you will need to manually annotate all cells inside that region of interest</strong>. Each region of interest should contain <strong>at least several dozens of cells, ideally ~100</strong>.</p>
+<p>These region of interests will be used to train the segmentation algorithm, so you should <strong>select the most representative parts of your data</strong>. If there are some particularly challenging parts of your data the you would like the segmentation algorithm to properly segment, then you should also select some regions of interest from these difficult parts.</p>
+</section>
+<section id="some-example-cases">
+<h3>Some example cases<a class="headerlink" href="#some-example-cases" title="Permalink to this headline"></a></h3>
+<p>Here there are some possible scenarios describing how you should proceed while choosing the regions of interest:</p>
+<ul class="simple">
+<li><p>Your images/datasets present several artifacts close to the borders, but you only care to have an accurate segmentation in the central part of the image, where image quality is higher and there are no artifacts. In this case, you can select regions of interest only from the central area of your image.</p></li>
+<li><p>Your images/datasets present several artifacts in all parts of the image, and you would like cells to be properly segmented even in parts of the image where these artifacts are present. Then, you should also include regions of interest where artifacts are present (but you should also include regions that are easier to segment)</p></li>
+<li><p>You acquired several images that look somehow different (different acquisition method, brightness, etc). Then, you should select regions of interest across all your images/datasets.</p></li>
+</ul>
+</section>
+</section>
+<section id="adding-images-to-the-annotation-project">
+<h2>Adding images to the annotation project<a class="headerlink" href="#adding-images-to-the-annotation-project" title="Permalink to this headline"></a></h2>
+<section id="adding-the-first-image">
+<h3>Adding the first image<a class="headerlink" href="#adding-the-first-image" title="Permalink to this headline"></a></h3>
+<figure class="align-default">
+<img alt="../_images/add-new-image.jpg" src="../_images/add-new-image.jpg" />
+</figure>
+<p>On the right side of the napari viewer, select the paths of an image you want to add to the project (either insert the path manually or click on the <em>Select file</em> buttons).</p>
+<p>For each image, you can add up to four channels:</p>
+<ul class="simple">
+<li><p><strong>Main channel</strong>: This is the main channel that will be used for segmentation (usually it is the bright-field channel)</p></li>
+<li><p><strong>DAPI channel</strong>: If available, add a DAPI channel because it often improves segmentation results</p></li>
+<li><p><strong>Extra channels</strong>: If you have additional channels that may be helpful for the manual annotation process, you can load them. They won’t be used by the segmentation algorithm though.</p></li>
+</ul>
+<p>After you select the files with the image channels, click on <em>Update Displayed Image Channels</em>: this will load the image in napari and add it to the project.</p>
+</section>
+</section>
+<section id="modify-create-regions-of-interest-in-napari">
+<h2>Modify / create regions of interest in Napari<a class="headerlink" href="#modify-create-regions-of-interest-in-napari" title="Permalink to this headline"></a></h2>
+<p>After you run the next cell, the selected image will be loaded in Napari.</p>
+<p>Then select the “Rectangle” tool in napari to draw one or more region of interests.</p>
+<p>After you are done, close the Napari window and run the  the next sections</p>
+<ul class="simple">
+<li><p>Select, move, and delete boxes</p></li>
+<li><p>Insert image of Napari viewer? (Showing the various buttons)</p></li>
+</ul>
+<!-- ![Napari](./napari-screenshot.jpg) -->
+<p>Run the following cell to start napari:</p>
+<section id="todo">
+<h3>TODO<a class="headerlink" href="#todo" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p>Press Space bar to move around</p></li>
+<li></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="label_rois.html" class="btn btn-neutral float-right" title="Label Regions of Interest" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alberto Bailoni &lt;alberto.bailoni@embl.de&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
