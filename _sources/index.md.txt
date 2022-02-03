@@ -1,15 +1,16 @@
-# SpaceM Annotator
+# SpaceM Annotator Documentation
 
 Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.  
 
-Go to the [](main_index). 
 
 ```{toctree}
 ---
-hidden: True
-maxdepth: 1
+maxdepth: 2
 caption: |
     Contents:
 ---
-Documentation <main_index>
+spacem_annotator/install
+spacem_annotator/select_rois
+spacem_annotator/label_rois
+spacem_annotator/training
 ```
