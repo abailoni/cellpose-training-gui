@@ -1,11 +1,11 @@
 # Getting started
 
-## Installation
+## How to install it
 The tool has already been installed on the following machines: 
 - **TODO**
 
 
-#### Installing it on your machine
+### Installing it on your machine
 If you prefer to install on your laptop, you will need [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://docs.anaconda.com/anaconda/install/index.html). The tool can be installed on Windows, Mac, or Linux. 
 
 Once you have `conda`, open a terminal and run the following command:
@@ -13,9 +13,8 @@ Once you have `conda`, open a terminal and run the following command:
 conda create --name spacem_annotator_env -c abailoni -c conda-forge spacem_annotator
 :::
 
-To test if your installation was successful, see how to [](getting_started).
 
-## How to start SpaceM Annotator
+## How to run it
 After being installed, you can start a new project by typing the following two commands in a shell:
 
 ```shell
