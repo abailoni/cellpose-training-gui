@@ -42,11 +42,14 @@ class BaseAnnotationExperiment(BaseExperiment):
         self._init_rois()
         self._init_input_images_df()
 
+        self.dump_configuration()
+
     def run(self):
         self.show_start_page()
 
     def show_start_page(self):
         self.main_window.show()
+        self.dump_configuration()
 
     @property
     def main_window(self):

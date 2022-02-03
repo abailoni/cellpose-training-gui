@@ -22,7 +22,7 @@ class RoiSelectionWidget(Container):
         self.shape_layer = None
         self._setup_gui()
 
-    def _setup_gui(self):
+    def _setup_gui(self, info_message=None):
         self.clear()
 
         # ----------------------------
@@ -84,18 +84,24 @@ class RoiSelectionWidget(Container):
             extra_ch_1 = self.get_path_file(self.extra_ch_1.value)
             extra_ch_2 = self.get_path_file(self.extra_ch_2.value)
 
-            # Save the given paths in the project:
-            self.image_id = self.main_gui.project.add_input_image(
-                main_ch,
-                dapi_path=dapi_ch,
-                extra_ch_1_path=extra_ch_1,
-                extra_ch_2_path=extra_ch_2,
-                id_input_image_to_rewrite=self.image_id,
-            )
+            if main_ch is not None:
+                if os.path.isfile(main_ch):
+                    # Save the given paths in the project:
+                    self.image_id = self.main_gui.project.add_input_image(
+                        main_ch,
+                        dapi_path=dapi_ch,
+                        extra_ch_1_path=extra_ch_1,
+                        extra_ch_2_path=extra_ch_2,
+                        id_input_image_to_rewrite=self.image_id,
+                    )
 
-            # Now we reload the interface of the widget:
-            self._setup_gui()
-            # TODO: after updating, select shape layer and the right tool!
+                    # Now we reload the interface of the widget:
+                    self._setup_gui()
+                    # TODO: after updating, select shape layer and the right tool!
+                    return
+
+            # Otherwise, show info message:
+            self._setup_gui(info_message="Path to main channel not existing!")
 
         self.extend(self.get_list_path_widgets())
         self.append(load_images_button)
@@ -142,6 +148,12 @@ class RoiSelectionWidget(Container):
             self.main_gui.show()
             self.main_gui.show_starting_gui()
         self.extend([close_button])
+
+        # Display message:
+        if info_message is not None:
+            assert isinstance(info_message, str)
+            self.append(widgets.Label(value=info_message))
+
 
     def get_path_file(self, real_path):
         assert isinstance(real_path, pathlib.PosixPath)

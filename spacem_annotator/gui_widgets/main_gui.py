@@ -17,7 +17,7 @@ class StartingGUI(Container):
         self.roi_select_viewer = None
         self.show_starting_gui()
 
-    def show_starting_gui(self):
+    def show_starting_gui(self, info_message=None):
         self.clear()
 
         select_rois_button = PushButton(name="select_rois", text="Select Regions of Interest")
@@ -27,11 +27,18 @@ class StartingGUI(Container):
         train_button = PushButton(name="start_training", text="Start Training")
         train_button.changed.connect(self.show_training_gui)
 
-        button_container = widgets.Container(layout="vertical",
-                                             widgets=[select_rois_button,
+        widgest_to_diplay = [select_rois_button,
                                                       label_rois_button,
                                                       # train_button
-                                                      ],
+                                                      ]
+
+        if info_message is not None:
+            assert isinstance(info_message, str)
+            widgest_to_diplay.append(widgets.Label(label=info_message))
+
+
+        button_container = widgets.Container(layout="vertical",
+                                             widgets=widgest_to_diplay,
                                              # label="Select one option:"
                                              )
 
@@ -53,21 +60,20 @@ class StartingGUI(Container):
 
 
     def show_roi_labeling_gui(self):
-        # FIXME: check if ROIS are more than zero!!
         rois_list = self.project.get_roi_list()
         if len(rois_list) == 0:
-            self.show_starting_gui()
+            self.show_starting_gui(info_message="First select some regions!")
+        else:
+            # Clear and hide the current GUI interface:
+            self.clear()
+            self.hide()
 
-        # Clear and hide the current GUI interface:
-        self.clear()
-        self.hide()
+            # Create a napari viewer with an additional widget:
+            self.roi_select_viewer = viewer = napari.Viewer()
 
-        # Create a napari viewer with an additional widget:
-        self.roi_select_viewer = viewer = napari.Viewer()
-
-        roi_labeling_widget = RoiLabeling(self)
-        viewer.window.add_dock_widget(roi_labeling_widget, area='right',
-                                      name="ROI labeling")
+            roi_labeling_widget = RoiLabeling(self)
+            viewer.window.add_dock_widget(roi_labeling_widget, area='right',
+                                          name="ROI labeling")
 
     def show_training_gui(self):
         pass
