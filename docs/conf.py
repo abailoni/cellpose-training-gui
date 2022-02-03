@@ -17,6 +17,8 @@ html_static_path = ["_static"]
 templates_path = ["_templates"]
 myst_enable_extensions = [
     "colon_fence",
+    "fieldlist"
 ]
 
-html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_rtd_theme'
+html_theme = "pydata_sphinx_theme"
