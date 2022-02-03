@@ -19,7 +19,10 @@ Here there are some possible scenarios describing how you should proceed while c
 
 ## Adding images to the annotation project
 ### Adding the first image
-:::{figure} ./images/add-new-image.jpg
+:::{image} ./images/add-new-image.jpg
+:alt: Add new image options
+:width: 250px
+:align: right
 :::
 On the right side of the napari viewer, select the paths of an image you want to add to the project (either insert the path manually or click on the _Select file_ buttons).
 
