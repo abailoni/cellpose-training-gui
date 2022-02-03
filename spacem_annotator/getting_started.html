@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Getting started &#8212; SpaceM Annotator  documentation</title>
+    <title>Run SpaceM Annotator &#8212; SpaceM Annotator  documentation</title>
     
     <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -35,7 +35,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Select Regions of Interest" href="select_rois.html" />
-    <link rel="prev" title="SpaceM Annotator" href="../index.html" />
+    <link rel="prev" title="Installation" href="install.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -71,26 +71,8 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 current active nav-item">
- <a class="current reference internal nav-link" href="#">
-  Getting started
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="select_rois.html">
-  Select Regions of Interest
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="label_rois.html">
-  Label Regions of Interest
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="training.html">
-  Training cellpose
+ <a class="reference internal nav-link" href="../main_index.html">
+  Documentation
  </a>
 </li>
 
@@ -124,7 +106,39 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Run SpaceM Annotator
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="select_rois.html">
+   Select Regions of Interest
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="label_rois.html">
+   Label Regions of Interest
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="training.html">
+   Training cellpose
+  </a>
+ </li>
+</ul>
+
   </div>
 </nav>
               </div>
@@ -146,23 +160,6 @@
 
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#installation">
-   Installation
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#local-installation">
-     Local installation
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-spacem-annotator">
-   Running SpaceM annotator
-  </a>
- </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#selecting-a-project-directory">
    Selecting a project directory
@@ -194,27 +191,13 @@
               
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="getting-started">
-<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The tool has already been installed on the following machines: <strong>TODO</strong>.</p>
-<section id="local-installation">
-<h3>Local installation<a class="headerlink" href="#local-installation" title="Permalink to this headline">¶</a></h3>
-<p>If you prefer to install on your laptop, you will need <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a> or <a class="reference external" href="https://docs.anaconda.com/anaconda/install/index.html">anaconda</a>. Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code>, open a terminal and run the following command:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda create --name spacem_annotator_env -c abailoni -c conda-forge spacem_annotator
-</pre></div>
-</div>
-</section>
-</section>
-<section id="running-spacem-annotator">
-<h2>Running SpaceM annotator<a class="headerlink" href="#running-spacem-annotator" title="Permalink to this headline">¶</a></h2>
+  <section class="tex2jax_ignore mathjax_ignore" id="run-spacem-annotator">
+<h1>Run SpaceM Annotator<a class="headerlink" href="#run-spacem-annotator" title="Permalink to this headline">¶</a></h1>
 <p>After being installed, you can start a new project by typing the following two commands in a shell:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda activate spacem_annotator_env
 python -m spacem_annotator
 </pre></div>
 </div>
-</section>
 <section id="selecting-a-project-directory">
 <h2>Selecting a project directory<a class="headerlink" href="#selecting-a-project-directory" title="Permalink to this headline">¶</a></h2>
 <p>After starting SpaceM Annotator, you will be asked to select the project directory.</p>
@@ -244,11 +227,11 @@ python -m spacem_annotator
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="install.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">SpaceM Annotator</p>
+            <p class="prev-next-title">Installation</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="select_rois.html" title="next page">

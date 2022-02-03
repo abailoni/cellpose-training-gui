@@ -2,15 +2,14 @@
 
 Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.  
 
+Go to the [](main_index). 
 
 ```{toctree}
 ---
-maxdepth: 2
+hidden: True
+maxdepth: 1
 caption: |
     Contents:
 ---
-spacem_annotator/getting_started
-spacem_annotator/select_rois
-spacem_annotator/label_rois
-spacem_annotator/training
+Documentation <main_index>
 ```

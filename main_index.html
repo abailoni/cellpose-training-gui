@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>SpaceM Annotator &#8212; SpaceM Annotator  documentation</title>
+    <title>SpaceM Annotator Documentation &#8212; SpaceM Annotator  documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -34,7 +34,8 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="SpaceM Annotator Documentation" href="main_index.html" />
+    <link rel="next" title="Installation" href="spacem_annotator/install.html" />
+    <link rel="prev" title="SpaceM Annotator" href="index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -52,7 +53,7 @@
   <div id="navbar-start">
     
     
-<a class="navbar-brand" href="#">
+<a class="navbar-brand" href="index.html">
 <p class="title">SpaceM Annotator</p>
 </a>
 
@@ -69,8 +70,8 @@
       
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="main_index.html">
+    <li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
   Documentation
  </a>
 </li>
@@ -105,7 +106,39 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="spacem_annotator/install.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="spacem_annotator/getting_started.html">
+   Run SpaceM Annotator
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="spacem_annotator/select_rois.html">
+   Select Regions of Interest
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="spacem_annotator/label_rois.html">
+   Label Regions of Interest
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="spacem_annotator/training.html">
+   Training cellpose
+  </a>
+ </li>
+</ul>
+
   </div>
 </nav>
               </div>
@@ -143,11 +176,34 @@
               
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="spacem-annotator">
-<h1>SpaceM Annotator<a class="headerlink" href="#spacem-annotator" title="Permalink to this headline">¶</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="spacem-annotator-documentation">
+<h1>SpaceM Annotator Documentation<a class="headerlink" href="#spacem-annotator-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.</p>
-<p>Go to the <a class="reference internal" href="main_index.html"><span class="doc std std-doc">SpaceM Annotator Documentation</span></a>.</p>
 <div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:
+</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#installing-it-on-your-machine">Installing it on your machine</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/getting_started.html">Run SpaceM Annotator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/getting_started.html#selecting-a-project-directory">Selecting a project directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/getting_started.html#starting-window">Starting Window</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/select_rois.html">Select Regions of Interest</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#what-are-regions-of-interest">What are regions of interest?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#adding-images-to-the-annotation-project">Adding images to the annotation project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#modify-create-regions-of-interest-in-napari">Modify / create regions of interest in Napari</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/label_rois.html">Label Regions of Interest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/training.html">Training cellpose</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/training.html#manually-training-a-new-cellpose-model">Manually training a new cellpose model</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </section>
 
@@ -157,10 +213,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='right-next' id="next-link" href="main_index.html" title="next page">
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">SpaceM Annotator</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="spacem_annotator/install.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">SpaceM Annotator Documentation</p>
+        <p class="prev-next-title">Installation</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
