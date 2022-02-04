@@ -1,5 +1,5 @@
 import pathlib
-from pathlib import PosixPath
+from pathlib import Path
 import os
 
 from magicgui.types import FileDialogMode
@@ -114,7 +114,7 @@ class RoiSelectionWidget(Container):
 
             for ch_name, wid in zip(self.channel_names, self.get_list_path_widgets()):
                 if ch_name in image_paths:
-                    path = PosixPath(image_paths[ch_name])
+                    path = Path(image_paths[ch_name])
                     wid.value = path
                     # print(path.resolve().as_posix(), wid.value)
 
@@ -156,7 +156,7 @@ class RoiSelectionWidget(Container):
 
 
     def get_path_file(self, real_path):
-        assert isinstance(real_path, pathlib.PosixPath)
+        assert isinstance(real_path, pathlib.Path)
         if os.path.isfile(real_path):
             return real_path.resolve().as_posix()
         else:

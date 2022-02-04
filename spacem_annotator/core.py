@@ -369,7 +369,8 @@ class BaseAnnotationExperiment(BaseExperiment):
             os.remove(roi_paths["cellpose_training_image"])
             # os.remove(roi_paths["composite_image"])
             for ch_name in roi_paths["single_channels"]:
-                os.remove(roi_paths["single_channels"][ch_name])
+                if roi_paths["single_channels"][ch_name] is not None:
+                    os.remove(roi_paths["single_channels"][ch_name])
 
     def get_crop_slice_from_roi_id(self, roi_id):
         self.assert_roi_id(roi_id)
