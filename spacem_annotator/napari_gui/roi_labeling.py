@@ -29,14 +29,19 @@ class RoiLabeling(Container):
 
         self.roi_to_annotate = widgets.ComboBox(
             label="Shown Region of Interest:",
-            choices=[roi_info['roi_id'] for roi_info in rois_list],
+            choices=[roi_idx for roi_idx in range(len(rois_list))],
             value=self.roi_id
             # description=None
         )
 
         @self.roi_to_annotate.changed.connect
         def update_roi_id():
-            self.roi_id = self.roi_to_annotate.value
+            # Save labels, in case the user forgot to click:
+            self.update_labels()
+
+            # Now display another ROI:
+            rois_indx = self.roi_to_annotate.value
+            self.roi_id = rois_list[rois_indx]['roi_id']
             self.load_images_in_viewer()
 
         self.append(self.roi_to_annotate)
@@ -44,19 +49,20 @@ class RoiLabeling(Container):
         # ----------------------------
         # Add button to save labels:
         # ----------------------------
-        save_labels = PushButton(name="save_labels", text="Save Labels")
+        save_labels = PushButton(name="save_labels", text="Save Annotations")
 
         @save_labels.changed.connect
         def update_labels():
-            viewer = self.main_gui.roi_select_viewer
-            annotation_layer = viewer.layers[viewer.layers.index(self.annotation_layer_name)]
-            self.main_gui.project.update_roi_labels(self.roi_id,
-                                                    annotation_layer.data.astype('uint16'))
+            self.update_labels()
 
         close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
 
         @close_button.changed.connect
         def close_viewer_and_go_back():
+            # Save labels, in case the user forgot:
+            self.update_labels()
+
+            # Now close and go back:
             self.main_gui.roi_select_viewer.close()
             self.main_gui.show()
             self.main_gui.show_starting_gui()
@@ -64,6 +70,12 @@ class RoiLabeling(Container):
         self.extend([save_labels, close_button])
 
         self.load_images_in_viewer()
+
+    def update_labels(self):
+        viewer = self.main_gui.roi_select_viewer
+        annotation_layer = viewer.layers[viewer.layers.index(self.annotation_layer_name)]
+        self.main_gui.project.update_roi_labels(self.roi_id,
+                                                annotation_layer.data.astype('uint16'))
 
     def load_images_in_viewer(self):
         viewer = self.main_gui.roi_select_viewer

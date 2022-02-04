@@ -42,6 +42,10 @@ class RoiSelectionWidget(Container):
 
         @self.selected_image.changed.connect
         def update_selected_image_id():
+            # First update ROIs, if user forgot:
+            if self.image_id is not None:
+                self.update_rois()
+
             # Find the ID of the selected image:
             choice = self.selected_image.value
             self.image_id = None if choice == "Add new image" else int(choice.split(" ")[1]) - 1
@@ -129,12 +133,7 @@ class RoiSelectionWidget(Container):
 
         @update_rois_button.changed.connect
         def update_rois():
-            assert self.image_id is not None
-            # TODO: create method to get annotation layer
-            idx = self.main_gui.roi_select_viewer.layers.index("Regions of interest")
-            shapes = self.main_gui.roi_select_viewer.layers[idx].data
-            if len(shapes):
-                self.main_gui.project.update_rois_image(self.image_id, shapes)
+            self.update_rois()
 
         if self.image_id is not None:
             self.extend([update_rois_button])
@@ -144,6 +143,10 @@ class RoiSelectionWidget(Container):
         close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
         @close_button.changed.connect
         def close_viewer_and_go_back():
+            # First update ROIs, if user forgot:
+            if self.image_id is not None:
+                self.update_rois()
+
             self.main_gui.roi_select_viewer.close()
             self.main_gui.show()
             self.main_gui.show_starting_gui()
@@ -154,6 +157,13 @@ class RoiSelectionWidget(Container):
             assert isinstance(info_message, str)
             self.append(widgets.Label(value=info_message))
 
+    def update_rois(self):
+        assert self.image_id is not None
+        # TODO: create method to get annotation layer
+        idx = self.main_gui.roi_select_viewer.layers.index("Regions of interest")
+        shapes = self.main_gui.roi_select_viewer.layers[idx].data
+        if len(shapes):
+            self.main_gui.project.update_rois_image(self.image_id, shapes)
 
     def get_path_file(self, real_path):
         assert isinstance(real_path, pathlib.Path)
