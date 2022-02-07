@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("."))
 
-project = "SpaceM Annotator"
+project = "Cellpose Training Napari"
 copyright = "2022, Alberto Bailoni <alberto.bailoni@embl.de>"
 author = "Alberto Bailoni <alberto.bailoni@embl.de>"
 extensions = [
@@ -17,8 +17,17 @@ html_static_path = ["_static"]
 templates_path = ["_templates"]
 myst_enable_extensions = [
     "colon_fence",
-    "fieldlist"
+    "fieldlist",
+    "substitution"
 ]
 
 # html_theme = 'sphinx_rtd_theme'
 html_theme = "pydata_sphinx_theme"
+
+# Some substitutions used in the project:
+myst_substitutions = {
+  "proj_name": project
+}
+
+# my_config_value = 42
+# rst_epilog = '.. |my_conf_val| replace:: %d' % my_config_value

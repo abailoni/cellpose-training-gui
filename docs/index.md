@@ -1,11 +1,11 @@
-# SpaceM Annotator Documentation
+# {{proj_name}}
 
 Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.  
 
 
 ```{toctree}
 ---
-maxdepth: 2
+maxdepth: 1
 caption: |
     Contents:
 ---

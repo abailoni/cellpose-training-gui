@@ -1,12 +1,12 @@
 # Getting started
 
 ## How to install it
-The tool has already been installed on the following machines: 
+The tool has been installed on the Surface Go tablet (you can find it in office 120): 
 - **TODO**
 
 
 ### Installing it on your machine
-If you prefer to install on your laptop, you will need [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://docs.anaconda.com/anaconda/install/index.html). The tool can be installed on Windows, Mac, or Linux. 
+If you prefer to install it on your laptop, you will need [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://docs.anaconda.com/anaconda/install/index.html). The tool can be installed on Windows, Mac, or Linux. 
 
 Once you have `conda`, open a terminal and run the following command:
 :::{code-block} shell

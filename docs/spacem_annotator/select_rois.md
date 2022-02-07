@@ -42,7 +42,7 @@ For each image, you can add up to four channels:
 After you select the files with the image channels, click on _Update Displayed Image Channels_. This will add the image to the project and the image channels will be loaded in napari in different colors.
 
 ### Browsing images in the project and adding new ones
-After adding the first image, you can add another image by selecting the _"Add new image"_ option from the dropdown menu _"Shown image"_. Alternatively, using the same menu, you can switch between the images that you added to the project.
+After adding the first image, you can add another image by selecting the _"Add new image"_ option from the dropdown menu _"Shown image"_ in the top-right corner. Alternatively, using the same menu, you can switch between the images in the project.
 
 :::{image} ./images/adding-new-image.jpg
 :alt: Modifying added images
@@ -52,8 +52,7 @@ After adding the first image, you can add another image by selecting the _"Add n
 
 
 ### Updating image channels
-At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the  
-_"Update Displayed Image Channels"_ button.
+At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the _Update Displayed Image Channels_ button.
 
 ## Modify / create regions of interest in Napari
 TODO

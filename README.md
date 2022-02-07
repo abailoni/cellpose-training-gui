@@ -1,3 +1,5 @@
 # SpaceM Annotator
-Tools for annotating images used for single-cell 
+Tools for annotating microscopy images.
+
+See documentation [here](https://abailoni.github.io/spacem_annotator).
 

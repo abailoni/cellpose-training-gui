@@ -1,4 +1,4 @@
-# Training cellpose
+# Train cellpose
 At the moment it is not possible to directly train a new cellpose model (this feature will be added in future).
 
 In the meantime, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.
