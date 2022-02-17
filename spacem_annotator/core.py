@@ -8,8 +8,9 @@ import pandas
 from speedrun import BaseExperiment
 
 from .gui_widgets.main_gui import StartingGUI
-from .io.images import read_uint8_img, write_image_to_file
+from .io.images import read_uint8_img, write_image_to_file, write_ome_tiff
 from .io.hdf5 import readHDF5, writeHDF5
+from .qupath import update_qupath_proj as qupath_utils
 
 
 class BaseAnnotationExperiment(BaseExperiment):
@@ -350,12 +351,16 @@ class BaseAnnotationExperiment(BaseExperiment):
             # ----------------------------
             # Write composite and single-channel cropped images:
             # ----------------------------
-            image_shape = img_channels[0][..., [0]]
-            # composite_image = np.concatenate([ch_image[..., [0]] for ch_image in img_channels if ch_image is not None], axis=2)
-            # write_image_to_file(roi_paths["composite_image"], composite_image)
+            # image_shape = img_channels[0][..., [0]]
+            composite_image = np.stack([ch_image[..., 0] for ch_image in img_channels if ch_image is not None], axis=0)
+            write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX")
             for i, ch_image in enumerate(img_channels):
                 if ch_image is not None:
                     write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
+
+            # Finally, add the image to the QuPath project:
+            qupath_utils.add_image_to_project(self.qupath_directory,
+                                              roi_paths["composite_image"])
 
     def _delete_training_images(self, list_roi_ids):
         """
@@ -366,11 +371,17 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         for roi_id in list_roi_ids:
             roi_paths = self.get_training_image_paths(roi_id)
+
+            # Remove single channels and cellpose inputs:
             os.remove(roi_paths["cellpose_training_image"])
-            # os.remove(roi_paths["composite_image"])
             for ch_name in roi_paths["single_channels"]:
                 if roi_paths["single_channels"][ch_name] is not None:
                     os.remove(roi_paths["single_channels"][ch_name])
+
+            # Delete image in QuPath:
+            qupath_utils.delete_image_from_project(self.qupath_directory, roi_id)
+            os.remove(roi_paths["composite_image"])
+
 
     def get_crop_slice_from_roi_id(self, roi_id):
         self.assert_roi_id(roi_id)
@@ -411,7 +422,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         out_dict = {
             "cellpose_training_image": os.path.join(self.experiment_directory,
                                                     "Cellpose/training_images/{}.tif".format(filename_roi_id)),
-            "composite_image": os.path.join(base_ann_dir, "input_images/composite/{}.tif".format(filename_roi_id)),
+            "composite_image": os.path.join(base_ann_dir, "input_images/composite/{}.ome.tif".format(filename_roi_id)),
             "label_image": label_image_path,
             "has_labels": os.path.exists(label_image_path),
             "single_channels": {}
@@ -460,14 +471,19 @@ class BaseAnnotationExperiment(BaseExperiment):
         """Directory for the experiment."""
         return self._experiment_directory
 
+    @property
+    def qupath_directory(self):
+        return os.path.join(self.experiment_directory, 'QuPathProject')
+
     @experiment_directory.setter
     def experiment_directory(self, value):
         if value is not None:
             # Make directories
             os.makedirs(os.path.join(value, 'Configurations'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs'), exist_ok=True)
-            # os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
             os.makedirs(os.path.join(value, 'Annotations/input_images/single_channels'), exist_ok=True)
             os.makedirs(os.path.join(value, 'Cellpose/training_labels'), exist_ok=True)
             os.makedirs(os.path.join(value, 'Cellpose/training_images'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'QuPathProject'), exist_ok=True)
             self._experiment_directory = value

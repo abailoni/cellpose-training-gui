@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 import imageio
 import os.path
+import tifffile
+from tifffile import TiffWriter
+
 
 def write_segm_to_file(path, array):
     filename, extension = os.path.splitext(os.path.split(path)[1])
@@ -12,6 +15,18 @@ def write_segm_to_file(path, array):
     else:
         raise ValueError("Only png and tif extensions supported")
 
+def write_ome_tiff(path, data, axes='TCZYX'):
+    assert path.endswith(".ome.tif")
+    tifffile.imwrite(
+        path, data, metadata={'axes': axes,
+                              # 'TimeIncrement': 1 / 10
+                              }
+    )
+    # with TiffWriter('temp.ome.tif') as tif:
+    #     tif.save(data0, compress=6, photometric='rgb')
+    #     tif.save(data1, photometric='minisblack',
+    #         metadata = {'axes': 'ZYX', 'SignificantBits': 10,
+    #                                 'Plane': {'PositionZ': [0.0, 1.0, 2.0, 3.0]}})
 
 def write_image_to_file(path, array):
     # TODO: to be improved
