@@ -69,34 +69,36 @@ class BaseAnnotationExperiment(BaseExperiment):
         if isinstance(new_napari_rois, list):
             new_napari_rois = np.array(new_napari_rois)
 
-        assert new_napari_rois.ndim == 3
-        assert new_napari_rois.shape[1] == 4 and new_napari_rois.shape[
-            2] == 2, "ROI array does not have the correct shape"
-        nb_added_rois = new_napari_rois.shape[0]
-
         # Get IDs of previous ROIs:
         prev_roi_ids = self._get_roi_ids_by_image_id(image_id)
         current_max_roi_id = self._napari_rois.shape[0]
-
-        # FIXME: by deleting everytime I update the ROIs, I could lose annotations!!
-        #    check if a ROI is already present (same exact points) and in that case leave it there
-        # Possibly, delete previous ROIs:
-        # Get previous napari rois:
         prev_napari_rois = self._napari_rois[prev_roi_ids]
-        check_rois = np.array([[np.allclose(new_roi, old_roi) for old_roi in prev_napari_rois]
-                               for new_roi in new_napari_rois])
-        # Add new ROIs:
-        rois_not_already_in_project = ~ np.any(check_rois, axis=1)
-        self._napari_rois = np.concatenate([self._napari_rois, new_napari_rois[rois_not_already_in_project]])
-        for i in range(current_max_roi_id, current_max_roi_id + rois_not_already_in_project.sum()):
-            self._rois_df.loc[i] = [i, image_id]
-            self._create_training_images([i])
 
-        # Remove ROIs that are not present anymore:
-        old_rois_to_be_deleted = ~ np.any(check_rois, axis=0)
-        old_rois_to_be_deleted = list(np.array(prev_roi_ids)[old_rois_to_be_deleted])
-        self._delete_training_images(old_rois_to_be_deleted)
-        self._delete_roi_ids(old_rois_to_be_deleted)
+        # Check if no new napari rois were passed:
+        if new_napari_rois.size == 0:
+            # Delete any previous ROIs:
+            self._delete_training_images(prev_roi_ids)
+            self._delete_roi_ids(prev_roi_ids)
+        else:
+            assert new_napari_rois.ndim == 3
+            assert new_napari_rois.shape[1] == 4 and new_napari_rois.shape[
+                2] == 2, "ROI array does not have the correct shape"
+
+            # Check what is there:
+            check_rois = np.array([[np.allclose(new_roi, old_roi) for old_roi in prev_napari_rois]
+                                   for new_roi in new_napari_rois])
+            # Add new ROIs:
+            rois_not_already_in_project = ~ np.any(check_rois, axis=1)
+            self._napari_rois = np.concatenate([self._napari_rois, new_napari_rois[rois_not_already_in_project]])
+            for i in range(current_max_roi_id, current_max_roi_id + rois_not_already_in_project.sum()):
+                self._rois_df.loc[i] = [i, image_id]
+                self._create_training_images([i])
+
+            # Remove ROIs that are not present anymore:
+            old_rois_to_be_deleted = ~ np.any(check_rois, axis=0)
+            old_rois_to_be_deleted = list(np.array(prev_roi_ids)[old_rois_to_be_deleted])
+            self._delete_training_images(old_rois_to_be_deleted)
+            self._delete_roi_ids(old_rois_to_be_deleted)
 
         # Update saved files:
         self.dump_rois()
@@ -391,7 +393,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         return (x_crop, y_crop)
 
     def assert_roi_id(self, roi_id):
-        assert np.array(self._rois_df['roi_id'].isin([roi_id])).sum() == 1, "ROI id not found"
+        assert np.array(self._rois_df['roi_id'].isin([roi_id])).sum() == 1, "ROI id not found: {}".format(roi_id)
 
     def get_roi_list(self):
         roi_list = []

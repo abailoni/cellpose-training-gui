@@ -162,8 +162,7 @@ class RoiSelectionWidget(Container):
         # TODO: create method to get annotation layer
         idx = self.main_gui.roi_select_viewer.layers.index("Regions of interest")
         shapes = self.main_gui.roi_select_viewer.layers[idx].data
-        if len(shapes):
-            self.main_gui.project.update_rois_image(self.image_id, shapes)
+        self.main_gui.project.update_rois_image(self.image_id, shapes)
 
     def get_path_file(self, real_path):
         assert isinstance(real_path, pathlib.Path)
