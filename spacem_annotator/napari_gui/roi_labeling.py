@@ -14,9 +14,12 @@ class RoiLabeling(Container):
     def __init__(self,
                  main_gui: "spacem_annotator.gui_widgets.start_window.StartingGUI"):
         super(RoiLabeling, self).__init__()
-        self.roi_id = 0
         self.main_gui = main_gui
         self.annotation_layer_name = "Annotations"
+
+        # Get id of the first ROI to display:
+        self.roi_id = main_gui.project.get_roi_list()[0]['roi_id']
+
         self._setup_gui()
 
     def _setup_gui(self):
@@ -30,7 +33,7 @@ class RoiLabeling(Container):
         self.roi_to_annotate = widgets.ComboBox(
             label="Shown Region of Interest:",
             choices=[roi_idx for roi_idx in range(len(rois_list))],
-            value=self.roi_id
+            value=[roi_info['roi_id'] for roi_info in rois_list].index(self.roi_id)
             # description=None
         )
 
