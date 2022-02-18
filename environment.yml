@@ -1,6 +1,5 @@
 name: spacem_annotator
 channels:
-  - abailoni
   - conda-forge
   - defaults
 dependencies:
@@ -12,6 +11,8 @@ dependencies:
   - imageio
   - opencv
   - napari
-  - magicgui
+  - magicgui # Probably already included in napari
   - pyqt
-  - speedrun
+  - abailoni::speedrun
+  - abailoni::paquo #  QuPath dependencies: TODO: create a QuPath flag?
+  - ome-zarr

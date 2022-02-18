@@ -25,12 +25,15 @@ requirements:
     - magicgui # Probably already included in napari
     - pyqt
     - speedrun
+    - paquo #  QuPath dependency: TODO: create a QuPath flag?
+    - ome-zarr
 
 test:
   imports:
     - spacem_annotator
     - spacem_annotator.core
     - spacem_annotator.napari_gui.roi_selection
+    - paquo #  QuPath dependency: TODO: create a QuPath flag?
   source_files:
     - tests/**/*.py
   commands:

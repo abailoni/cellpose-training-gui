@@ -26,10 +26,11 @@ def add_image_to_project(qupath_proj_dir, image_path):
 def delete_image_from_project(qupath_proj_dir, image_id):
     assert paquo is not None, "Paquo library is required to interact with QuPath project"
 
+    print("Deleting ROI {} from QuPath project".format(image_id))
     if not isinstance(image_id, (int, slice)):
         assert isinstance(image_id, np.ndarray)
         image_id = image_id.item()
 
     with QuPathProject(qupath_proj_dir, mode="r+") as qp:
-        qp.remove_image(image_id)
-
+        image_entry_id = '{}'.format(image_id+1)
+        qp.remove_image(image_entry_id)
