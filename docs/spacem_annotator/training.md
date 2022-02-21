@@ -1,7 +1,7 @@
 # Train cellpose
-At the moment it is not possible to directly train a new cellpose model (this feature will be added in future).
+At the moment it is not possible to directly train a new cellpose model from the graphical interface.
 
-In the meantime, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.
+For the moment, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.
 
 ## Manually training a new cellpose model
 
@@ -10,4 +10,4 @@ In the meantime, you can either send your annotations to me (Alberto) or, if you
 - In the input training images, the green channel represents the main segmentation channel and the red channel is the DAPI channel (if present, otherwise it will be black).
 
 #### Tips for training
-- 
+Coming soon
