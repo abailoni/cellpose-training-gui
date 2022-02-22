@@ -19,7 +19,10 @@ def add_image_to_project(qupath_proj_dir, image_path):
         image_path = Path(image_path)
 
     with QuPathProject(qupath_proj_dir, mode="a") as qp:
-        # TODO: In the end I should be able to set allow-duplicates to false
+        # FIXME: In the end I should be able to set allow-duplicates to false
+        #   Sometimes I need to update the channels of an image, so I should not create a new one
+        #      Channels are updated automatically (but I shoudl not add a new one),
+        #      but not channel colors
         qp.add_image(image_path, image_type=QuPathImageType.OTHER, allow_duplicates=True)
 
 
