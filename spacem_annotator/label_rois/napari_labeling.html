@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Annotating in Napari &#8212; SpaceM Annotator  documentation</title>
+    
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+    
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
+    
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Annotating in QuPath" href="quapth_labeling.html" />
+    <link rel="prev" title="Annotate Regions of Interest" href="label_rois.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">SpaceM Annotator</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../install.html">
+  Getting started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../select_rois.html">
+  Select Regions of Interest
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="label_rois.html">
+  Annotate Regions of Interest
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../training.html">
+  Train cellpose
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Annotating in Napari
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="quapth_labeling.html">
+   Annotating in QuPath
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-napari-annotation-tools">
+   Using Napari annotation tools
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#napari-annotation-toolbar">
+     Napari annotation toolbar
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <a class="reference internal image-reference" href="../../_images/starting-gui-label.jpg"><img alt="Button to start labeling in Napari" class="align-right" src="../../_images/starting-gui-label.jpg" style="width: 45%;" /></a>
+<section class="tex2jax_ignore mathjax_ignore" id="annotating-in-napari">
+<h1>Annotating in Napari<a class="headerlink" href="#annotating-in-napari" title="Permalink to this headline">¶</a></h1>
+<p>You can start labeling in Napari by clicking on the <code class="docutils literal notranslate"><span class="pre">Label</span> <span class="pre">Regions</span> <span class="pre">of</span> <span class="pre">Interest</span></code> button in the main window of the annotation tool. A new napari viewer will then open, displaying one region of interest at the time.</p>
+<p><strong>Selecting a region of interest</strong>:
+To start annotating, you first select a region of interest by using the drop-down menu in the top-right corner (see image below). Initially, the first region will be displayed.</p>
+<a class="reference internal image-reference" href="../../_images/adjust-contrast.jpg"><img alt="Adjust layer contrast" class="align-center" src="../../_images/adjust-contrast.jpg" style="width: 100%;" /></a>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Remember that you should label all cells inside a region of interest!</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For making the annotation process easier, it may be helpful to <strong>adjust the contrast</strong> of some image channel. To do so, first select an image channel  (for example the main channel) in the layers list on the left and then adjust the <code class="docutils literal notranslate"><span class="pre">Contrast</span> <span class="pre">limits</span></code> slider on the top-left (see image above).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Annotations are automatically saved when you switch to another region of interest or go back to the starting window. However, you can manually save your annotations at any moment by clicking on the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code> button on the right.</p>
+</div>
+<section id="using-napari-annotation-tools">
+<h2>Using Napari annotation tools<a class="headerlink" href="#using-napari-annotation-tools" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>complete tutorial</strong> explaining all the annotations tools in Napari can be found <a class="reference external" href="https://napari.org/tutorials/fundamentals/labels.html">here</a>.
+However, in the following you will find a recap of the most important functions and tools.</p>
+<section id="napari-annotation-toolbar">
+<h3>Napari annotation toolbar<a class="headerlink" href="#napari-annotation-toolbar" title="Permalink to this headline">¶</a></h3>
+<a class="reference internal image-reference" href="../../_images/annotations-tools.jpg"><img alt="Annotation toolbar" class="align-right" src="../../_images/annotations-tools.jpg" style="width: 30%;" /></a>
+<p>Before to start annotating, make sure that the <code class="docutils literal notranslate"><span class="pre">Annotations</span></code> layer is selected in the layers list on the left:</p>
+<ul class="simple">
+<li><p><strong>Move around and zoom</strong>: To move the image or zoom in/out, select the “Lens” tool (button 5 in the image) in the top-left corner toolbar in Napari. You can zoom by scrolling with your mouse/trackpad. Keep in mind that when you have some of the other annotation tools selected, you can zoom or move around in the image by keeping the <code class="docutils literal notranslate"><span class="pre">SpaceBar</span></code> key pressed.</p></li>
+<li><p><strong>Painting tools</strong>: Use the <em>paint</em> tool (button 2) to start drawing. You can adjust the brush size by using the slider on the left. If you want to erase or undo something, use the <em>erase</em> tool (button 1). You can also press <code class="docutils literal notranslate"><span class="pre">Ctrl+Z</span></code> to undo your last changes. Finally, with the <em>fill</em> tool (button 3) you can pour areas of paint on to the image that expand until it finds a border it cannot flow over.</p></li>
+<li><p><strong>Annotating a new cell</strong>: If you want to start labeling a new cell, you should pick a color that was not used before. You can do that by pressing the <code class="docutils literal notranslate"><span class="pre">M</span></code> key.</p></li>
+<li><p><strong>Updating annotation of an existing cell</strong>: If you want to keep labeling an existing cell or update its annotation, you can select its color by using the <em>picker</em> tool (button 4).</p></li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Keep in mind that you can <strong>decrease the opacity</strong> of the annotation layer if you want to see more of the original image (and increase the transparency of the manual annotations).</p>
+</div>
+</section>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="label_rois.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Annotate Regions of Interest</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="quapth_labeling.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Annotating in QuPath</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, Alberto Bailoni &lt;alberto.bailoni@embl.de&gt;.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
