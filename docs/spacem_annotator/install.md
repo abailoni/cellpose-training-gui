@@ -3,13 +3,14 @@
 ## Annotating on the Surface Go tablet
 The tool has been installed on the Surface Go tablet (you can find it in office 120). 
 
-To start the tool, follow these steps:  
+To start the tool:  
 - Start "_Anaconda Powershell Prompt_" from the applications
 - Then, type the following two commands:
     ```shell
     conda activate spacem_annotator_env
     python -m spacem_annotator
     ````
+- Next you will need to {ref}`select a project directory<proj_dir>`
 
 
 ## Manual installation
@@ -27,6 +28,7 @@ conda activate spacem_annotator_env
 python -m spacem_annotator
 ````
 
+(proj_dir)=
 ## Selecting a project directory
 After starting SpaceM Annotator, you will be asked to select the project directory.
 
