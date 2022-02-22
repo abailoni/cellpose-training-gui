@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Training cellpose &#8212; SpaceM Annotator  documentation</title>
+    <title>Train cellpose &#8212; SpaceM Annotator  documentation</title>
     
     <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -34,7 +34,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Label Regions of Interest" href="label_rois.html" />
+    <link rel="prev" title="Annotating in QuPath" href="label_rois/quapth_labeling.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -82,14 +82,14 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="label_rois.html">
-  Label Regions of Interest
+ <a class="reference internal nav-link" href="label_rois/label_rois.html">
+  Annotate Regions of Interest
  </a>
 </li>
 
 <li class="toctree-l1 current active nav-item">
  <a class="current reference internal nav-link" href="#">
-  Training cellpose
+  Train cellpose
  </a>
 </li>
 
@@ -183,24 +183,22 @@
               
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="training-cellpose">
-<h1>Training cellpose<a class="headerlink" href="#training-cellpose" title="Permalink to this headline">¶</a></h1>
-<p>At the moment it is not possible to directly train a new cellpose model (this feature will be added in future).</p>
-<p>In the meantime, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="train-cellpose">
+<h1>Train cellpose<a class="headerlink" href="#train-cellpose" title="Permalink to this headline">¶</a></h1>
+<p>At the moment it is not possible to directly train a new cellpose model from the graphical interface.</p>
+<p>For the moment, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.</p>
 <section id="manually-training-a-new-cellpose-model">
 <h2>Manually training a new cellpose model<a class="headerlink" href="#manually-training-a-new-cellpose-model" title="Permalink to this headline">¶</a></h2>
 <section id="input-data">
 <h3>Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>You can find all the necessary images to start the training in the <code class="docutils literal notranslate"><span class="pre">project_dir/Cellpose</span></code> folder. Inpiut images and training labels are already in the format expected by the cellpose script.</p></li>
+<li><p>You can find all the necessary images to start the training in the <code class="docutils literal notranslate"><span class="pre">project_dir/Cellpose</span></code> folder. Input images and training labels are already in the format expected by the cellpose script.</p></li>
 <li><p>In the input training images, the green channel represents the main segmentation channel and the red channel is the DAPI channel (if present, otherwise it will be black).</p></li>
 </ul>
 </section>
 <section id="tips-for-training">
 <h3>Tips for training<a class="headerlink" href="#tips-for-training" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li></li>
-</ul>
+<p>Coming soon</p>
 </section>
 </section>
 </section>
@@ -211,11 +209,11 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="label_rois.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="label_rois/quapth_labeling.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Label Regions of Interest</p>
+            <p class="prev-next-title">Annotating in QuPath</p>
         </div>
     </a>
 </div>

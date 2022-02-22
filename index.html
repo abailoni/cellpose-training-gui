@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>SpaceM Annotator Documentation &#8212; SpaceM Annotator  documentation</title>
+    <title>SpaceM Annotator &#8212; SpaceM Annotator  documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -82,14 +82,14 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="spacem_annotator/label_rois.html">
-  Label Regions of Interest
+ <a class="reference internal nav-link" href="spacem_annotator/label_rois/label_rois.html">
+  Annotate Regions of Interest
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="spacem_annotator/training.html">
-  Training cellpose
+  Train cellpose
  </a>
 </li>
 
@@ -161,26 +161,31 @@
               
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="spacem-annotator-documentation">
-<h1>SpaceM Annotator Documentation<a class="headerlink" href="#spacem-annotator-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="spacem-annotator">
+<h1>SpaceM Annotator<a class="headerlink" href="#spacem-annotator" title="Permalink to this headline">¶</a></h1>
+<p>SpaceM Annotator lets you load your single-cell microscopy images in Napari, select the regions of interests that you plan to annotate, and then annotate cells by using either Napari or QuPath.</p>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">SpaceM Annotator documentation:
 </span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="spacem_annotator/install.html">Getting started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#how-to-install-it">How to install it</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#how-to-run-it">How to run it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#annotating-on-the-surface-go-tablet">Annotating on the Surface Go tablet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#manual-installation">Manual installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/install.html#selecting-a-project-directory">Selecting a project directory</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spacem_annotator/select_rois.html">Select Regions of Interest</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#what-are-regions-of-interest">What are regions of interest?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#adding-images-to-the-annotation-project">Adding images to the annotation project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#modify-create-regions-of-interest-in-napari">Modify / create regions of interest in Napari</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/select_rois.html#selecting-regions-of-interest-in-napari">Selecting regions of interest in Napari</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/label_rois.html">Label Regions of Interest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/training.html">Training cellpose</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/label_rois/label_rois.html">Annotate Regions of Interest</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/label_rois/napari_labeling.html">Annotating in Napari</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacem_annotator/label_rois/quapth_labeling.html">Annotating in QuPath</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spacem_annotator/training.html">Train cellpose</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spacem_annotator/training.html#manually-training-a-new-cellpose-model">Manually training a new cellpose model</a></li>
 </ul>
 </li>
