@@ -1,6 +1,6 @@
 # Select Regions of Interest
 
-After clinking on _"Select Regions of Interest"_ in the starting window of the annotation tool, a napari viewer will open and let you add images to the project and select regions of interest. 
+After clinking on `Select Regions of Interest` in the starting window of the annotation tool, a napari viewer will open and let you add images to the project and select regions of interest. 
 
 :::{image} ./images/selecting_rois.jpg
 :alt: Napari interface to select ROIs
@@ -52,7 +52,7 @@ After adding the first image, you can add another image by selecting the _"Add n
 
 
 ### Updating image channels
-At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the _Update Displayed Image Channels_ button.
+At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the `Update Displayed Image Channels` button.
 
 ## Selecting regions of interest in Napari
 Once you selected an image in your project, you will see that a new shapes layer named "_Regions of interest_" has been loaded in Napari.
@@ -67,7 +67,7 @@ After selecting the shape layer, you can perform the following three actions:
 :::
 
 1. **Move around and zoom**: To move the image or zoom in/out, make sure that you select the "Lens" tool in the top-left corner toolbar in Napari. You can zoom by scrolling with your mouse/trackpad.
-2. **Create ROIs**: To create a new region of interest, select the Napari "Rectangle" tool (see button 2 in the image on the right) and then draw one or more boxes. Then you can click on the "_Save Regions of Interest_" button on the right to immediately save the selected ROIs.
+2. **Create ROIs**: To create a new region of interest, select the Napari "Rectangle" tool (see button 2 in the image on the right) and then draw one or more boxes. Then you can click on the `Save Regions of Interest` button on the right to immediately save the selected ROIs.
 3. **Delete or modify ROIs**: In this case, select the "Select" tool in Napari (see button 3 in the image on the right). Then you can click on a box and press \<backspace> to delete the rectangle. Otherwise, you can drag the rectangle around or adjust the corners.  
 
 

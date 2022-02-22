@@ -1,5 +1,5 @@
-# Label Regions of Interest
-When you have selected regions of interest, you can start labeling. Currently, creating manual annotations can be done both in Napari and QuPath:
+# Annotate Regions of Interest
+When you have selected regions of interest, you can start manually annotating. Currently, creating manual annotations can be done both in Napari and QuPath:
 ```{toctree}
 ---
 maxdepth: 1

@@ -50,5 +50,5 @@ python -m spacem_annotator --proj_dir /path/to/the/project/directory
 :::
 After selecting a project directory, you have two choices:
 1. [](select_rois): First, select this option to add images to the project and select some regions of interest.
-2. [](label_rois): After selecting some regions of interest, click on this option to start annotating your regions of interest.
+2. [](label_rois/label_rois): After selecting some regions of interest, click on this option to start annotating your regions of interest in Napari.
 
