@@ -9,7 +9,7 @@
 ---
 maxdepth: 2
 caption: |
-    SpaceM Annotator documentation:
+    Documentation:
 ---
 spacem_annotator/install
 spacem_annotator/select_rois
