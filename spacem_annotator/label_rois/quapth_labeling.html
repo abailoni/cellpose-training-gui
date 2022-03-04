@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Annotating in QuPath &#8212; SpaceM Annotator  documentation</title>
+    <title>Annotating in QuPath &#8212; Cellpose-training-GUI  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -54,7 +54,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">SpaceM Annotator</p>
+<p class="title">Cellpose-training-GUI</p>
 </a>
 
     
@@ -307,7 +307,7 @@
 <li><p><strong>Updating the annotation of a cell</strong>: Start using the brush inside an existing annotation object/cell and drag the mouse around to extend the annotated area.</p></li>
 <li><p><strong>Eraser:</strong> Holding down the <code class="docutils literal notranslate"><span class="pre">Alt</span></code> key (or <code class="docutils literal notranslate"><span class="pre">Option</span></code> key on Mac) while using the brush causes it to ‘subtract’ regions… basically acting as an eraser (or painterly equivalent).</p></li>
 <li><p><strong>Adaptive brush size</strong>: <em>The size of the brush adapts according to magnification.</em> In other words, if you zoom in then the brush effectively paints small regions - while zoomed out it can quickly mark in large areas (you can change the absolute size of the brush in the settings, and also optionally turn off the size adaption according to zoom).</p></li>
-<li><p><strong>Avoid overlapping segments</strong>: If you have two cells that touch each other’s, but you want to avoid having overlapping annotations, there is a very convenient function in QuPath that can help. First, paint the first cell; then, create another annotation for the second cell without worrying about <em>overshooting</em> borders and creating overlapping areas; when you are done, you can hold the <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> keys (<code class="docutils literal notranslate"><span class="pre">Cmd+Shift</span></code> on Mac) and click inside the second cell: this will automatically remove areas overlapping with other annotations.</p></li>
+<li><p><strong>Avoid overlapping segments</strong>: If you have two cells that touch each other’s, but you want to avoid having overlapping annotations, there is a very convenient function in QuPath that can help. First, paint the first cell; then, create another annotation for the second cell without worrying about <em>overshooting</em> borders and creating overlapping areas; when you are done, you can hold the <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> keys (<code class="docutils literal notranslate"><span class="pre">Cmd+Shift</span></code> on Mac) and click with the digital pen inside the second cell: this will automatically remove areas overlapping with other annotations.</p></li>
 <li><p><strong>Undo the last change</strong>: You find the option in the <code class="docutils literal notranslate"><span class="pre">Edit</span></code> menu or you can simply press <code class="docutils literal notranslate"><span class="pre">Ctrl+Z</span></code> key (<code class="docutils literal notranslate"><span class="pre">Cmd+Z</span></code> on Mac)</p></li>
 </ul>
 </section>
@@ -323,9 +323,10 @@
 <ul class="simple">
 <li><p>Press <code class="docutils literal notranslate"><span class="pre">B</span></code> to select the brush tool, press <code class="docutils literal notranslate"><span class="pre">W</span></code> to select the wand tool, press <code class="docutils literal notranslate"><span class="pre">M</span></code> for the move tool.</p></li>
 <li><p>Hold <code class="docutils literal notranslate"><span class="pre">SpaceBar</span></code> to temporarily select the move tool and move around in the image or zoom in.</p></li>
-<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Alt</span></code> while brushing to erase/erode areas from the selected annotation object</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Alt</span></code> while brushing to erase areas from the selected annotation object</p></li>
 <li><p>Press <code class="docutils literal notranslate"><span class="pre">Ctrl+Z</span></code> to undo the last change</p></li>
-<li><p>Press <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> and click inside a segment to remove overlapping areas</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> and touch the screen (or click with the digital pen) inside a segment to remove overlapping areas</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Shift</span></code> and click with the mouse inside a segment to quickly select a cell class (in the case you have multiple classes of cells that you want to distinguish)</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

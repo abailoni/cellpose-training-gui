@@ -111,7 +111,7 @@ This would have limited call for excitement, but the _Brush tool_ within QuPath 
 - **Updating the annotation of a cell**: Start using the brush inside an existing annotation object/cell and drag the mouse around to extend the annotated area.
 - **Eraser:** Holding down the `Alt` key (or `Option` key on Mac) while using the brush causes it to ‘subtract’ regions... basically acting as an eraser (or painterly equivalent).
 - **Adaptive brush size**: _The size of the brush adapts according to magnification._ In other words, if you zoom in then the brush effectively paints small regions - while zoomed out it can quickly mark in large areas (you can change the absolute size of the brush in the settings, and also optionally turn off the size adaption according to zoom).
-- **Avoid overlapping segments**: If you have two cells that touch each other's, but you want to avoid having overlapping annotations, there is a very convenient function in QuPath that can help. First, paint the first cell; then, create another annotation for the second cell without worrying about _overshooting_ borders and creating overlapping areas; when you are done, you can hold the `Ctrl+Shift` keys (`Cmd+Shift` on Mac) and click inside the second cell: this will automatically remove areas overlapping with other annotations. 
+- **Avoid overlapping segments**: If you have two cells that touch each other's, but you want to avoid having overlapping annotations, there is a very convenient function in QuPath that can help. First, paint the first cell; then, create another annotation for the second cell without worrying about _overshooting_ borders and creating overlapping areas; when you are done, you can hold the `Ctrl+Shift` keys (`Cmd+Shift` on Mac) and click with the digital pen inside the second cell: this will automatically remove areas overlapping with other annotations. 
 - **Undo the last change**: You find the option in the `Edit` menu or you can simply press `Ctrl+Z` key (`Cmd+Z` on Mac)
 
 [comment]: <> (- If you hold the `Shift` key while using the brush, you make sure to extend the annotation of the selected object &#40;without creating a new object&#41;. Currently, on a Windows tablet holding the `Shift` key does not work correctly &#40;it instead zooms in and out&#41;.)
@@ -128,9 +128,10 @@ With the _Wand tool_, you can use all the shortcuts and tips explained above for
 This is a list of the most useful shortcuts that you will probably need while annotating:
 - Press `B` to select the brush tool, press `W` to select the wand tool, press `M` for the move tool.
 - Hold `SpaceBar` to temporarily select the move tool and move around in the image or zoom in.
-- Hold `Alt` while brushing to erase/erode areas from the selected annotation object
+- Hold `Alt` while brushing to erase areas from the selected annotation object
 - Press `Ctrl+Z` to undo the last change
-- Press `Ctrl+Shift` and click inside a segment to remove overlapping areas
+- Hold `Ctrl+Shift` and touch the screen (or click with the digital pen) inside a segment to remove overlapping areas
+- Hold `Shift` and click with the mouse inside a segment to quickly select a cell class (in the case you have multiple classes of cells that you want to distinguish)
 
 
 ::::{note}
