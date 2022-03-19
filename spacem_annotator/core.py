@@ -36,6 +36,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         if not load_prev_experiment:
             self.set("max_nb_extra_channels", 2)
             self.set("extra_channels_names", ["Extra ch. 1", "Extra ch. 2"])
+            self.set("labeling_tool", "QuPath")
 
         # Initialize or load dataframes:
         self._rois_df = None

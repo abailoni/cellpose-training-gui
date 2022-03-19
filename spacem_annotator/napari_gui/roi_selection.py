@@ -139,7 +139,6 @@ class RoiSelectionWidget(Container):
             self.extend([update_rois_button])
 
         # Button to go back to the main
-        # TODO: when closing napari, show initial window
         close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
         @close_button.changed.connect
         def close_viewer_and_go_back():

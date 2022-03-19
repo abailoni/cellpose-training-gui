@@ -16,3 +16,5 @@ dependencies:
   - abailoni::speedrun
   - abailoni::paquo #  QuPath dependencies: TODO: create a QuPath flag?
   - ome-zarr
+    # For cellpose
+  - numba

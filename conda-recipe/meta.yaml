@@ -27,6 +27,8 @@ requirements:
     - speedrun
     - paquo #  QuPath dependency: TODO: create a QuPath flag?
     - ome-zarr
+    # For cellpose
+    - numba
 
 test:
   imports:
