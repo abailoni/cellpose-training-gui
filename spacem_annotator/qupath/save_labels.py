@@ -16,13 +16,18 @@ except ImportError:
     paquo = None
 
 
-def export_labels_from_qupath(qupath_proj_dir, out_folder):
+def export_labels_from_qupath(qupath_proj_dir, out_folder, filename_postfix=None):
     assert paquo is not None, "Paquo library is required to interact with QuPath project"
 
     with QuPathProject(qupath_proj_dir, mode="r+") as qp:
         for image in qp.images:
             # Export labels:
             image_name = os.path.split(image.uri)[1]
+            assert "ome.tif" in image_name
+            image_name = image_name.replace(".ome.tif", ".tif")
+            if filename_postfix is not None:
+                assert isinstance(filename_postfix, str)
+                image_name = image_name.replace(".tif", "_{}.tif".format(filename_postfix))
             image_data = image.java_object.readImageData()
             out_labels = LabeledImageServer.Builder(image_data).backgroundLabel(0, ColorTools.BLACK).downsample(
                 1).useInstanceLabels().multichannelOutput(False).build()

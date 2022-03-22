@@ -49,6 +49,7 @@ def write_ome_tiff(path, data, axes='TCZYX',
 
     tifffile.imwrite(
         path, data, metadata=metadata
+        # , ome=True
     )
     # with TiffWriter('temp.ome.tif') as tif:
     #     tif.save(data0, compress=6, photometric='rgb')

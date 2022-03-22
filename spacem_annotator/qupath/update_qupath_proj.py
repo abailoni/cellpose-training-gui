@@ -31,6 +31,11 @@ def add_image_to_project(qupath_proj_dir, image_path):
         # Now add it to the project:
         if add_new_image:
             qp.add_image(image_path, image_type=QuPathImageType.OTHER, allow_duplicates=False)
+            # new_entry.metadata = {
+            #         "annotator": "Alice",
+            #         "status": "finished",
+            #         "diagnosis": "healthy",
+            # }
 
 
 def delete_image_from_project(qupath_proj_dir, image_id):

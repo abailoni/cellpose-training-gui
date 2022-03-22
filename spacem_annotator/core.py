@@ -1,16 +1,23 @@
 import math
 import os
+import shutil
+from copy import deepcopy
 from shutil import copyfile
 
 import numpy as np
 import pandas
+import tifffile
+import yaml
 
 from speedrun import BaseExperiment
+from speedrun.yaml_utils import recursive_update
 
 from .gui_widgets.main_gui import StartingGUI
 from .io.images import read_uint8_img, write_image_to_file, write_ome_tiff
 from .io.hdf5 import readHDF5, writeHDF5
 from .qupath import update_qupath_proj as qupath_utils
+from .qupath.save_labels import export_labels_from_qupath
+from .io.various import yaml2dict
 
 
 class BaseAnnotationExperiment(BaseExperiment):
@@ -37,6 +44,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             self.set("max_nb_extra_channels", 2)
             self.set("extra_channels_names", ["Extra ch. 1", "Extra ch. 2"])
             self.set("labeling_tool", "QuPath")
+            self.set_default_training_args()
 
         # Initialize or load dataframes:
         self._rois_df = None
@@ -349,7 +357,9 @@ class BaseAnnotationExperiment(BaseExperiment):
                 cellpose_image[..., 2] = img_channels[1][..., 0]
 
             # Apply crop and write image:
-            write_image_to_file(roi_paths["cellpose_training_image"], cellpose_image)
+            # tifffile.imwrite(roi_paths["cellpose_training_input_image"], cellpose_image)
+            write_image_to_file(roi_paths["cellpose_training_input_image"], cellpose_image)
+            # write_ome_tiff(roi_paths["cellpose_training_input_image"], cellpose_image, axes="YX")
 
             # ----------------------------
             # Write composite and single-channel cropped images:
@@ -366,9 +376,9 @@ class BaseAnnotationExperiment(BaseExperiment):
             print([ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if ch is not None])
             write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX",
                            channel_names=[ch_name for ch_name, ch in zip(ch_names, img_channels) if ch is not None],
-                           channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if ch is not None],
+                           channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if
+                                           ch is not None],
                            )
-
 
             # Finally, add the image to the QuPath project:
             qupath_utils.add_image_to_project(self.qupath_directory,
@@ -385,7 +395,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             roi_paths = self.get_training_image_paths(roi_id)
 
             # Remove single channels and cellpose inputs:
-            os.remove(roi_paths["cellpose_training_image"])
+            os.remove(roi_paths["cellpose_training_input_image"])
             for ch_name in roi_paths["single_channels"]:
                 if roi_paths["single_channels"][ch_name] is not None:
                     os.remove(roi_paths["single_channels"][ch_name])
@@ -393,7 +403,6 @@ class BaseAnnotationExperiment(BaseExperiment):
             # Delete image in QuPath:
             qupath_utils.delete_image_from_project(self.qupath_directory, int(roi_id))
             os.remove(roi_paths["composite_image"])
-
 
     def get_crop_slice_from_roi_id(self, roi_id):
         self.assert_roi_id(roi_id)
@@ -428,13 +437,14 @@ class BaseAnnotationExperiment(BaseExperiment):
         self.assert_roi_id(roi_id)
         filename_roi_id = "{:04d}".format(roi_id)
 
-        base_ann_dir = os.path.join(self.experiment_directory, "Annotations")
-        label_image_path = self.get_label_file_path(roi_id)
+        base_ROI_dir = os.path.join(self.experiment_directory, "ROIs")
+        label_image_path = self.get_napari_label_file_path(roi_id)
         # Add main paths to crop images:
+        # TODO: fix cellpose input mess (ome vs tif, channels colors cellpose input)
         out_dict = {
-            "cellpose_training_image": os.path.join(self.experiment_directory,
-                                                    "Cellpose/training_images/{}.tif".format(filename_roi_id)),
-            "composite_image": os.path.join(base_ann_dir, "input_images/composite/{}.ome.tif".format(filename_roi_id)),
+            "cellpose_training_input_image": os.path.join(base_ROI_dir,
+                                                          "ROI_images/cellpose_input/{}.tif".format(filename_roi_id)),
+            "composite_image": os.path.join(base_ROI_dir, "ROI_images/composite/{}.ome.tif".format(filename_roi_id)),
             "label_image": label_image_path,
             "has_labels": os.path.exists(label_image_path),
             "single_channels": {}
@@ -448,7 +458,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             # Check if channel is present, then add:
             if isinstance(path, str):
                 out_dict["single_channels"][ch_names[i]] = \
-                    os.path.join(base_ann_dir, "input_images/single_channels/{}_ch{}.tif".format(filename_roi_id, i))
+                    os.path.join(base_ROI_dir, "ROI_images/single_channels/{}_ch{}.tif".format(filename_roi_id, i))
             else:
                 out_dict["single_channels"][ch_names[i]] = None
 
@@ -458,8 +468,128 @@ class BaseAnnotationExperiment(BaseExperiment):
         roi_info = self.get_training_image_paths(roi_id)
         write_image_to_file(roi_info["label_image"], roi_labels)
 
-    def get_label_file_path(self, roi_id):
-        return os.path.join(self.experiment_directory, "Cellpose/training_labels", "{:04d}_masks.tif".format(roi_id))
+    def get_napari_label_file_path(self, roi_id):
+        return os.path.join(self.experiment_directory, "ROIs/ROI_images/napari_labels",
+                            "{:04d}_masks.tif".format(roi_id))
+
+    # --------------------------------------------
+    # Cellpose training:
+    # --------------------------------------------
+
+    def setup_cellpose_training_data(self, model_name):
+        training_folder = os.path.join(self.experiment_directory, "CellposeTraining", model_name)
+        training_images_dir = os.path.join(training_folder, "training_images")
+
+        # Create dirs, if not already present:
+        os.makedirs(training_folder, exist_ok=True)
+        os.makedirs(training_images_dir, exist_ok=True)
+
+        # Write training config to file
+        training_config = deepcopy(self.get("training_config"))
+        training_config.pop("custom_model_path_GUI")
+        training_config.pop("pretrained_model_GUI")
+        training_config.pop("model_name")
+        # Specify relative training path:
+        training_config["train_folder"] = os.path.join("CellposeTraining", model_name, "training_images")
+        training_config_path = os.path.join(training_folder, "train_config.yml")
+        existing_training_config = yaml2dict(training_config_path) if os.path.exists(training_config_path) else {}
+        existing_training_config = recursive_update(existing_training_config, training_config)
+        with open(training_config_path, 'w') as f:
+            yaml.dump(existing_training_config, f)
+
+        # Delete and recopy training images:
+        shutil.rmtree(training_images_dir)
+        cellpose_input_images_dir = os.path.join(self.experiment_directory, "ROIs/ROI_images/cellpose_input")
+        shutil.copytree(cellpose_input_images_dir, training_images_dir)
+
+        # Collect labels from QuPath or Napari:
+        if self.get("labeling_tool") == "QuPath":
+            export_labels_from_qupath(self.qupath_directory, training_images_dir, filename_postfix="masks")
+        elif self.get("labeling_tool") == "Napari":
+            # TODO: Only copy actual existing ROIs
+            # TODO: assert that all labels are present
+            shutil.copytree(os.path.join(self.experiment_directory, "ROIs/ROI_images/napari_labels"),
+                            training_images_dir, dirs_exist_ok=True)
+        else:
+            raise ValueError("Labeling tool not recognized")
+
+    def run_cellpose_training(self, model_name):
+        # TODO: assert training data is in place (I wont create it here in case the user wants to run it
+        #  from CLI and add custom stuff)
+        pass
+
+        # TODO: do I need to create model folder?
+        # os.makedirs(os.path.join(training_folder, "trained_model"), exist_ok=True)
+        # TODO: get train dir and out dir for models
+
+    def update_main_training_config(self,
+                                    model_name,
+                                    **GUI_training_kwargs
+                                    ):
+        """
+        Function called from magicgui widget to update training parameters set via the GUI
+        """
+        # Prepare training config:
+        training_config = {}
+        training_config["model_name"] = model_name
+        training_config["cellpose_kwargs"] = cellpose_kwargs = {}
+
+        # Validate pretrained model kwargs:
+        if "pretrained_model" not in GUI_training_kwargs:
+            return False, "No pretrained model was specified or recognized"
+        if "custom_model_path" not in GUI_training_kwargs:
+            return False, "No custom model path was specified"
+        training_config["pretrained_model_GUI"] = GUI_training_kwargs["pretrained_model"]
+        training_config["custom_model_path_GUI"] = GUI_training_kwargs["custom_model_path"]
+
+        if GUI_training_kwargs["pretrained_model"] == "None":
+            # TODO: Check if this works in config
+            cellpose_kwargs["pretrained_model"] = None
+        elif GUI_training_kwargs["pretrained_model"] == "Custom model":
+            custom_model_path = GUI_training_kwargs["custom_model_path"]
+            if not os.path.isfile(custom_model_path):
+                return False, "The path of the custom model was not found"
+            cellpose_kwargs["pretrained_model"] = custom_model_path
+        else:
+            # Set model to one of the default cellpose models:
+            cellpose_kwargs["pretrained_model"] = GUI_training_kwargs["pretrained_model"]
+
+        # Validate other kwargs from GUI:
+        for kwarg in ["batch_size", "n_epochs", "learning_rate"]:
+            if kwarg in GUI_training_kwargs:
+                cellpose_kwargs[kwarg] = GUI_training_kwargs[kwarg]
+
+        # Write to main config:
+        old_training_config = self.get("training_config", ensure_exists=True)
+        old_training_config.update(training_config)
+        self.set("training_config", old_training_config)
+        self.dump_configuration()
+
+        return True, None
+
+    def set_default_training_args(self):
+        training_config = {"model_name": "my_trained_model",
+                           "cellpose_args": ["no_npy", "save_each",
+                                             "dir_above", "look_one_level_down"],
+                           "pretrained_model_GUI": "cyto2",
+                           "custom_model_path_GUI": ""}
+
+        training_config["cellpose_kwargs"] = cellpose_kwargs = {}
+
+        cellpose_kwargs["pretrained_model"] = "cyto2"
+        cellpose_kwargs["save_every"] = 10
+        cellpose_kwargs["learning_rate"] = 0.002
+        cellpose_kwargs["chan"] = 2
+        cellpose_kwargs["chan2"] = 1
+        cellpose_kwargs["n_epochs"] = 500
+        cellpose_kwargs["batch_size"] = 8
+        cellpose_kwargs["mask_filter"] = "_masks"
+
+        self.set("training_config", training_config)
+        self.dump_configuration()
+
+    def get_training_parameters_GUI(self):
+        return self.get("training_config")
 
     # --------------------------------------------
     # Internal methods:
@@ -493,9 +623,10 @@ class BaseAnnotationExperiment(BaseExperiment):
             # Make directories
             os.makedirs(os.path.join(value, 'Configurations'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Annotations/input_images/composite'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Annotations/input_images/single_channels'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Cellpose/training_labels'), exist_ok=True)
-            os.makedirs(os.path.join(value, 'Cellpose/training_images'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'ROIs/ROI_images/composite'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'ROIs/ROI_images/single_channels'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'ROIs/ROI_images/cellpose_input'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'ROIs/ROI_images/napari_labels'), exist_ok=True)
+            os.makedirs(os.path.join(value, "CellposeTraining"), exist_ok=True)
             os.makedirs(os.path.join(value, 'QuPathProject'), exist_ok=True)
             self._experiment_directory = value

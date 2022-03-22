@@ -11,7 +11,23 @@ from magicgui.widgets import (
 
 from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
-from .training_cellpose_gui import CellposeTrainingGUI
+
+
+def show_message_pop_up(info_message: str):
+    assert isinstance(info_message, str)
+    info_window = widgets.Container()
+    close_window_button = PushButton(name="close_window", text="Ok")
+    info_window.extend([
+        widgets.Label(label=info_message),
+        close_window_button
+    ])
+
+    info_window.show()
+
+    @close_window_button.changed.connect
+    def close_info_window():
+        info_window.clear()
+        info_window.hide()
 
 
 class StartingGUI(Container):
@@ -22,7 +38,7 @@ class StartingGUI(Container):
         self.roi_select_viewer = None
         self.show_starting_gui()
 
-    def show_starting_gui(self, info_message=None):
+    def show_starting_gui(self):
         self.clear()
 
         select_rois_button = PushButton(name="select_rois", text="Select Regions of Interest")
@@ -59,10 +75,6 @@ class StartingGUI(Container):
                                                        widgets.Label(value=""),
                                                        ])
 
-        if info_message is not None:
-            assert isinstance(info_message, str)
-            widgest_to_diplay.append(widgets.Label(label=info_message))
-
         button_container = widgets.Container(layout="horizontal",
                                              widgets=[labels, column_1, widgest_to_diplay],
                                              # label="Select one option:"
@@ -88,18 +100,11 @@ class StartingGUI(Container):
         viewer.window.add_dock_widget(roi_selection_widget, area='right',
                                       name="ROI selection")  # Add our gui instance to napari viewer
 
-    def start_qupath(self):
-        rois_list = self.project.get_roi_list()
-        if len(rois_list) == 0:
-            self.show_starting_gui(info_message="First select some regions of interest!")
-        else:
-            pass
-            # TODO: start QuPath and load project
-
     def show_roi_labeling_gui(self):
         rois_list = self.project.get_roi_list()
         if len(rois_list) == 0:
-            self.show_starting_gui(info_message="First select some regions of interest!")
+            self.show_starting_gui()
+            show_message_pop_up("First select some regions of interest!")
         else:
             labeling_tool = self.labeling_tool_combobox.value
             if labeling_tool == "QuPath":
@@ -123,30 +128,41 @@ class StartingGUI(Container):
             else:
                 raise ValueError("Labeling tool not recognized")
 
+    # ------------------------
+    # Training GUI:
+    # ------------------------
+
     def show_training_gui(self):
         rois_list = self.project.get_roi_list()
         if len(rois_list) == 0:
-            self.show_starting_gui(info_message="First select some regions of interest!")
+            self.show_starting_gui()
+            show_message_pop_up("First select some regions of interest!")
         else:
             # Clear and hide the current GUI interface:
             self.clear()
+
+            training_params = self.project.get_training_parameters_GUI()
+            cellopose_training_kwargs = training_params["cellpose_kwargs"]
 
             # Show button to go back:
             close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
 
             @close_button.changed.connect
             def close_viewer_and_go_back():
-                self.clear()
-                # Hide and show to reset the size of the window:
-                self.hide()
-                self.show()
-                self.show_starting_gui()
+                if self.is_valid_training_config():
+                    # TODO: update main train config in main project
+
+                    self.clear()
+                    # Hide and show to reset the size of the window:
+                    self.hide()
+                    self.show()
+                    self.show_starting_gui()
 
             self.model_name = widgets.LineEdit(
                 name="model_name",
-                label="Name of trained model",
-                tooltip="Pick a name for the model that will be trained (better not to use spaces)",
-                value="my_trained_model"
+                label="Model name (no spaces)",
+                tooltip="Pick a name for the model that will be trained (do not use spaces)",
+                value=training_params["model_name"]
             )
 
             # Choose model:
@@ -154,7 +170,7 @@ class StartingGUI(Container):
                 label="Pretrained model",
                 tooltip="Choose the pretrained model from which to start training",
                 choices=["None", "cyto2", "Custom model"],
-                value="cyto2"
+                value=training_params["pretrained_model_GUI"]
             )
 
             # Custom model path:
@@ -162,17 +178,18 @@ class StartingGUI(Container):
                 name="main_channel",
                 tooltip="If using a custom model, select its path",
                 mode=FileDialogMode.EXISTING_FILE,
-                label="Custom model path", value="",
+                value=training_params["custom_model_path_GUI"],
+                label="Custom model path"
             )
 
-            self.nb_epochs = widgets.SpinBox(
-                name="nb_epochs",
+            self.n_epochs = widgets.SpinBox(
+                name="n_epochs",
                 label="Number of epochs",
                 tooltip="Select for how many epochs the model will be trained",
                 min=1,
                 step=20,
                 max=5000,
-                value=500
+                value=cellopose_training_kwargs["n_epochs"],
             )
 
             self.batch_size = widgets.SpinBox(
@@ -182,43 +199,65 @@ class StartingGUI(Container):
                 min=1,
                 step=1,
                 max=50,
-                value=8
+                value=cellopose_training_kwargs["batch_size"]
             )
 
-            # TODO: assert is float
-            self.lr = widgets.LineEdit(
-                name="lr",
+            self.learning_rate = widgets.LineEdit(
+                name="learning_rate",
                 label="Learning rate",
                 tooltip="Select the learning rate used for training",
-                value=0.02,
-                # min=0,
-                # max=1,
-                # step=0.001
-                # base=10
+                value=cellopose_training_kwargs["learning_rate"],
             )
 
-            save_to_config_button = PushButton(name="save_to_config", text="Save training setup to config")
+            setup_training_data_button = PushButton(name="setup_training_data",
+                                                    text="Setup training data and save training config")
             start_training_button = PushButton(name="start_training", text="Start training")
 
-            @save_to_config_button.changed.connect
-            def save_to_config():
-                # TODO: get images from QuPath if needed
-                pass
+            @setup_training_data_button.changed.connect
+            def setup_training_data():
+                if self.is_valid_training_config():
+                    self.project.setup_cellpose_training_data(self.model_name.value)
 
             @start_training_button.changed.connect
-            def save_to_config():
-                # TODO: get images from QuPath if needed
+            def start_training():
+                self.is_valid_training_config()
                 pass
 
             self.extend([
                 self.model_name,
                 self.pretrained_model,
                 self.custom_model_path,
-                self.nb_epochs,
+                self.n_epochs,
                 self.batch_size,
-                self.lr,
+                self.learning_rate,
+                setup_training_data_button,
                 start_training_button,
-                save_to_config_button,
                 close_button,
 
             ])
+
+    def is_valid_training_config(self):
+        if " " in self.model_name.value:
+            show_message_pop_up("The model name should not contain spaces")
+            return False
+        try:
+            float(self.learning_rate.value)
+        except ValueError:
+            show_message_pop_up("The learning rate should be a float number")
+            return False
+        self.update_main_training_config()
+        return True
+
+    def update_main_training_config(self):
+        training_kwargs = {
+            "pretrained_model": self.pretrained_model.value,
+            "custom_model_path": str(self.custom_model_path.value),
+            "n_epochs": self.n_epochs.value,
+            "batch_size": self.batch_size.value,
+            "learning_rate": eval(self.learning_rate.value)
+        }
+        was_updated, error_message = self.project.update_main_training_config(self.model_name.value, **training_kwargs)
+        if not was_updated:
+            show_message_pop_up(error_message)
+
+    # self.model_name.value
