@@ -12,7 +12,7 @@ from ..io.images import read_uint8_img
 
 class RoiLabeling(Container):
     def __init__(self,
-                 main_gui: "spacem_annotator.gui_widgets.start_window.StartingGUI"):
+                 main_gui: "traincellpose.gui_widgets.start_window.StartingGUI"):
         super(RoiLabeling, self).__init__()
         self.main_gui = main_gui
         self.annotation_layer_name = "Annotations"

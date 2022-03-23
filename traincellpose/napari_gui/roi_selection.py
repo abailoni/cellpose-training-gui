@@ -14,7 +14,7 @@ from ..io.images import read_uint8_img
 
 class RoiSelectionWidget(Container):
     def __init__(self,
-                 main_gui: "spacem_annotator.gui_widgets.start_window.StartingGUI"):
+                 main_gui: "traincellpose.gui_widgets.start_window.StartingGUI"):
         super(RoiSelectionWidget, self).__init__()
         self.main_gui = main_gui
         nb_images_in_proj = main_gui.project.nb_input_images

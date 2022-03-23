@@ -31,7 +31,7 @@ def show_message_pop_up(info_message: str):
 
 
 class StartingGUI(Container):
-    def __init__(self, annotation_project: "spacem_annotator.BaseAnnotationExperiment"):
+    def __init__(self, annotation_project: "traincellpose.BaseAnnotationExperiment"):
         super(StartingGUI, self).__init__()
         self.project = annotation_project
         # self.max_width = 300

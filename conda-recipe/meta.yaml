@@ -1,5 +1,5 @@
 package:
-  name: spacem_annotator
+  name: traincellpose
   version: 0.1.2
 
 source:
@@ -32,9 +32,9 @@ requirements:
 
 test:
   imports:
-    - spacem_annotator
-    - spacem_annotator.core
-    - spacem_annotator.napari_gui.roi_selection
+    - traincellpose
+    - traincellpose.core
+    - traincellpose.napari_gui.roi_selection
     - paquo #  QuPath dependency: TODO: create a QuPath flag?
   source_files:
     - tests/**/*.py
@@ -42,5 +42,5 @@ test:
     - python -m unittest discover -s test -v
 
 about:
-  home: https://github.com/abailoni/spacem_annotator
+  home: https://github.com/abailoni/cellpose-training-gui
   license: MIT

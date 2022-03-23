@@ -1,4 +1,4 @@
-name: spacem_annotator
+name: traincellpose
 channels:
   - conda-forge
   - defaults

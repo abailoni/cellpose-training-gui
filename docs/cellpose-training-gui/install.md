@@ -8,7 +8,7 @@ To start the tool:
 - Then, type the following two commands:
     ```shell
     conda activate spacem_annotator_env
-    python -m spacem_annotator
+    python -m traincellpose
     ````
 - Next you will need to {ref}`select a project directory<proj_dir>`
 
@@ -25,7 +25,7 @@ After being installed, you can start the tool by typing the following two comman
 
 ```shell
 conda activate spacem_annotator_env
-python -m spacem_annotator
+python -m traincellpose
 ````
 
 (proj_dir)=

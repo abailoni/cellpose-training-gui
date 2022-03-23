@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="spacem_annotator",
+    name="traincellpose",
     author="Alberto Bailoni",
     author_email="alberto.bailoni@embl.de",
     description="Library for annotating singe-cell microscopy images",
