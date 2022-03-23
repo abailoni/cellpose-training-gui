@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("."))
 
-project = "SpaceM Annotator"
+project = "Cellpose-training-GUI"
 copyright = "2022, Alberto Bailoni <alberto.bailoni@embl.de>"
 author = "Alberto Bailoni <alberto.bailoni@embl.de>"
 extensions = [

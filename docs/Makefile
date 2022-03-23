@@ -6,7 +6,7 @@
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
-BUILDDIR      = ../../spacem_annotator_docs
+BUILDDIR      = ../../cellpose-training-gui-docs
 
 # Put it first so that "make" without argument is like "make help".
 help:

@@ -9,7 +9,7 @@
 ---
 maxdepth: 2
 caption: |
-    SpaceM Annotator documentation:
+    Documentation:
 ---
 cellpose-training-gui/install
 cellpose-training-gui/select_rois
