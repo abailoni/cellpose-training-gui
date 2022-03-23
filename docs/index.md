@@ -11,8 +11,8 @@ maxdepth: 2
 caption: |
     SpaceM Annotator documentation:
 ---
-spacem_annotator/install
-spacem_annotator/select_rois
-spacem_annotator/label_rois/label_rois
-spacem_annotator/training
+cellpose-training-gui/install
+cellpose-training-gui/select_rois
+cellpose-training-gui/label_rois/label_rois
+cellpose-training-gui/training
 ```

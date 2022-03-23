@@ -11,3 +11,5 @@ For the moment, you can either send your annotations to me (Alberto) or, if you 
 
 ### Tips for training
 Coming soon
+
+- [](training_cli)
