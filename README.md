@@ -1,5 +1,5 @@
-# SpaceM Annotator
-Tools for annotating microscopy images.
+# Cellpose training GUI
+Tools for manually annotating images and training a custom cellpose model.
 
-See documentation [here](https://abailoni.github.io/spacem_annotator).
+See documentation [here](https://abailoni.github.io/cellpose-training-gui).
 
