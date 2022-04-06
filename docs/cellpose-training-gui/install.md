@@ -7,7 +7,7 @@ To start the tool:
 - Start "_Anaconda Powershell Prompt_" from the applications
 - Then, type the following two commands:
     ```shell
-    conda activate spacem_annotator_env
+    conda activate traincellpose_env
     python -m traincellpose
     ````
 - Next you will need to {ref}`select a project directory<proj_dir>`
@@ -18,13 +18,13 @@ If you prefer to install it on your machine, you will need [miniconda](https://d
 
 Once you have `conda`, open a terminal and run the following command:
 :::{code-block} shell
-conda create --name spacem_annotator_env -c abailoni -c conda-forge -c sdvillal spacem_annotator
+conda create --name traincellpose_env -c abailoni -c conda-forge -c sdvillal traincellpose
 :::
 
 After being installed, you can start the tool by typing the following two commands in a command line:
 
 ```shell
-conda activate spacem_annotator_env
+conda activate traincellpose_env
 python -m traincellpose
 ````
 
@@ -37,7 +37,7 @@ After starting SpaceM Annotator, you will be asked to select the project directo
 ::::{tip}
 You can also pass the path of the project directory as a command line argument when you run SpaceM Annotator:
 :::{code-block} shell
-python -m spacem_annotator --proj_dir /path/to/the/project/directory
+python -m traincellpose --proj_dir /path/to/the/project/directory
 :::
 ::::
 

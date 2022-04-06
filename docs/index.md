@@ -14,5 +14,5 @@ caption: |
 cellpose-training-gui/install
 cellpose-training-gui/select_rois
 cellpose-training-gui/label_rois/label_rois
-cellpose-training-gui/training
+cellpose-training-gui/cellpose_training/training
 ```

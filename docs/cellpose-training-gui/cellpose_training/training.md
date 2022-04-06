@@ -10,6 +10,4 @@ For the moment, you can either send your annotations to me (Alberto) or, if you 
 - In the input training images, the green channel represents the main segmentation channel and the red channel is the DAPI channel (if present, otherwise it will be black).
 
 ### Tips for training
-Coming soon
-
 - [](training_cli)

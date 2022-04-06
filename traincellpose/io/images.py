@@ -4,7 +4,10 @@ import imageio
 import os.path
 import tifffile
 
-from ome_zarr.conversions import rgba_to_int
+try:
+    from ome_zarr.conversions import rgba_to_int
+except ImportError:
+    rgba_to_int = None
 
 try:
     from paquo.colors import QuPathColor
@@ -31,6 +34,7 @@ def write_segm_to_file(path, array):
 def write_ome_tiff(path, data, axes='TCZYX',
                    channel_names=None, channel_colors=None):
     assert path.endswith(".ome.tif")
+    assert rgba_to_int is not None, "ome-zarr module needs to be installed"
 
     metadata = {'axes': axes}
 

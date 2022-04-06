@@ -9,12 +9,14 @@ import pandas
 import tifffile
 import yaml
 
-from speedrun import BaseExperiment
+from speedrun import BaseExperiment, locate
 from speedrun.yaml_utils import recursive_update
+from .cellpose_training.start_training import start_cellpose_training
 
 from .gui_widgets.main_gui import StartingGUI
 from .io.images import read_uint8_img, write_image_to_file, write_ome_tiff
 from .io.hdf5 import readHDF5, writeHDF5
+from .preprocessing.utils import apply_preprocessing_to_image
 from .qupath import update_qupath_proj as qupath_utils
 from .qupath.save_labels import export_labels_from_qupath
 from .io.various import yaml2dict
@@ -356,10 +358,19 @@ class BaseAnnotationExperiment(BaseExperiment):
             if self.use_dapi_channel_for_segmentation and img_channels[1] is not None:
                 cellpose_image[..., 2] = img_channels[1][..., 0]
 
-            # Apply crop and write image:
+            # TODO: improve implementation exposing parameters to GUI?
+            # Check if I should apply any preprocessing:
+            preproc_kwargs = self.get("preprocessing")
+            if preproc_kwargs is not None:
+                print("INFO: Preprocessing image...")
+                cellpose_image[..., 1] = apply_preprocessing_to_image(cellpose_image[..., 1], "main", preproc_kwargs)
+                cellpose_image[..., 2] = apply_preprocessing_to_image(cellpose_image[..., 2], "DAPI", preproc_kwargs)
+
+            # Write image:
             # tifffile.imwrite(roi_paths["cellpose_training_input_image"], cellpose_image)
             write_image_to_file(roi_paths["cellpose_training_input_image"], cellpose_image)
             # write_ome_tiff(roi_paths["cellpose_training_input_image"], cellpose_image, axes="YX")
+
 
             # ----------------------------
             # Write composite and single-channel cropped images:
@@ -480,6 +491,12 @@ class BaseAnnotationExperiment(BaseExperiment):
         training_folder = os.path.join(self.experiment_directory, "CellposeTraining", model_name)
         training_images_dir = os.path.join(training_folder, "training_images")
 
+        # FIXME: temporary
+        all_rois = self._rois_df["roi_id"].tolist()
+        print(all_rois)
+        self._create_training_images(all_rois)
+
+
         # Create dirs, if not already present:
         os.makedirs(training_folder, exist_ok=True)
         os.makedirs(training_images_dir, exist_ok=True)
@@ -514,13 +531,27 @@ class BaseAnnotationExperiment(BaseExperiment):
             raise ValueError("Labeling tool not recognized")
 
     def run_cellpose_training(self, model_name):
-        # TODO: assert training data is in place (I wont create it here in case the user wants to run it
-        #  from CLI and add custom stuff)
-        pass
+        # Assert that training data is present:
+        training_folder = os.path.join(self.experiment_directory, "CellposeTraining", model_name)
+        training_images_dir = os.path.join(training_folder, "training_images")
+        training_config_path = os.path.join(training_folder, "train_config.yml")
+        assert os.path.exists(training_folder)
+        assert os.path.exists(training_images_dir)
+        assert os.path.exists(training_config_path)
+        training_config = yaml2dict(training_config_path)
+
+        # TODO: remove this double stuff
+        train_folder = os.path.join(self.experiment_directory, training_config.pop("train_folder"))
+        assert train_folder == training_images_dir
+
+        start_cellpose_training(train_folder,
+                                *training_config.get("cellpose_args", []),
+                                out_models_folder=os.path.split(train_folder)[0],
+                                **training_config.get("cellpose_kwargs", {}))
 
         # TODO: do I need to create model folder?
-        # os.makedirs(os.path.join(training_folder, "trained_model"), exist_ok=True)
         # TODO: get train dir and out dir for models
+        # os.makedirs(os.path.join(training_folder, "trained_model"), exist_ok=True)
 
     def update_main_training_config(self,
                                     model_name,
@@ -569,8 +600,10 @@ class BaseAnnotationExperiment(BaseExperiment):
 
     def set_default_training_args(self):
         training_config = {"model_name": "my_trained_model",
-                           "cellpose_args": ["no_npy", "save_each",
-                                             "dir_above", "look_one_level_down"],
+                           "cellpose_args": ["no_npy",
+                                             # "save_each", # Save models at different epochs, based on "save_every"
+                                             # "dir_above", # Only useful when saving images, not trained models
+                                             "verbose"],
                            "pretrained_model_GUI": "cyto2",
                            "custom_model_path_GUI": ""}
 

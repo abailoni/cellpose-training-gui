@@ -220,8 +220,8 @@ class StartingGUI(Container):
 
             @start_training_button.changed.connect
             def start_training():
-                self.is_valid_training_config()
-                pass
+                if self.is_valid_training_config():
+                    self.project.run_cellpose_training(self.model_name.value)
 
             self.extend([
                 self.model_name,

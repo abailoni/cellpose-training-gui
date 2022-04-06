@@ -1,4 +1,6 @@
 import os
+import shutil
+import subprocess
 import sys
 
 try:
@@ -8,8 +10,9 @@ except ImportError:
 
 
 def start_cellpose_training(train_folder,
-                            test_folder=None,
                             *cellpose_args,
+                            test_folder=None,
+                            out_models_folder=None,
                             **cellpose_kwargs
                             ):
     """
@@ -19,8 +22,10 @@ def start_cellpose_training(train_folder,
     # Compose the command to be run:
     # TODO: move fast_mode to config?
     python_interpreter = sys.executable
-    command = "{} -m cellpose {} --train" \
+    CUDA_VISIBLE_DEVICES = os.environ["CUDA_VISIBLE_DEVICES"] if "CUDA_VISIBLE_DEVICES" in os.environ else "0"
+    command = "{} {} -m cellpose {} --train" \
               " --use_gpu --fast_mode --dir {} {} ".format(
+        "CUDA_VISIBLE_DEVICES=" + CUDA_VISIBLE_DEVICES,
         python_interpreter,
         "--" if "ipython" in python_interpreter else "",
         train_folder,
@@ -35,10 +40,18 @@ def start_cellpose_training(train_folder,
     for kwarg in cellpose_kwargs:
         command += "--{} {} ".format(kwarg, cellpose_kwargs[kwarg])
 
-    os.system(command)
+    print(command)
+    subprocess.run(command, shell=True, check=True)
 
-    # TODO: copy models when done?
+    if out_models_folder is not None:
+        os.makedirs(out_models_folder, exist_ok=True)
+        basedir, dirname = os.path.split(out_models_folder)
+        if dirname != "models":
+            out_models_folder = os.path.join(out_models_folder, "models")
 
+        # Copy new trained models to target folder:
+        cellpose_out_model_dir = os.path.join(train_folder, "models")
+        shutil.copytree(cellpose_out_model_dir, out_models_folder, dirs_exist_ok=True)
 
-def update_training_config():
-    pass
+        # Now delete the original folder:
+        shutil.rmtree(cellpose_out_model_dir)

@@ -78,7 +78,7 @@ class RoiSelectionWidget(Container):
         )
 
         # Add button to load the channels and save them in the project:
-        load_images_button = PushButton(name="load_images", text="Update Displayed Image Channels")
+        load_images_button = PushButton(name="load_images", text="Update Image Channels")
 
         @load_images_button.changed.connect
         def update_image_paths():
