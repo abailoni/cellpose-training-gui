@@ -8,6 +8,7 @@ import numpy as np
 import pandas
 import tifffile
 import yaml
+from pathlib import Path
 
 from speedrun import BaseExperiment, locate
 from speedrun.yaml_utils import recursive_update
@@ -19,7 +20,7 @@ from .io.hdf5 import readHDF5, writeHDF5
 from .preprocessing.utils import apply_preprocessing_to_image
 from .qupath import update_qupath_proj as qupath_utils
 from .qupath.save_labels import export_labels_from_qupath
-from .io.various import yaml2dict
+from .io.various import yaml2dict, get_path_components
 
 
 class BaseAnnotationExperiment(BaseExperiment):
@@ -47,6 +48,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             self.set("extra_channels_names", ["Extra ch. 1", "Extra ch. 2"])
             self.set("labeling_tool", "QuPath")
             self.set_default_training_args()
+            self.set_default_preprocessing_config()
 
         # Initialize or load dataframes:
         self._rois_df = None
@@ -202,9 +204,23 @@ class BaseAnnotationExperiment(BaseExperiment):
 
     def get_input_image_id_from_path(self, main_image_path):
         df = self._input_images_df
+
+        # If image is in proj dir, then get relative path:
+        if os.path.isabs(main_image_path):
+            is_in_exp_dir, main_image_path = self.is_path_in_exp_dir(main_image_path)
+
         image_id = df.loc[df["main_path"] == main_image_path, "image_id"].tolist()
         assert len(image_id) == 1
         return image_id[0]
+
+    def is_path_in_exp_dir(self, path):
+        if path is not None:
+            path = path if isinstance(path, Path) else Path(path)
+            is_in_exp_dir = Path(self.experiment_directory) in path.parents
+            path = os.path.relpath(path, self.experiment_directory) if is_in_exp_dir else path
+        else:
+            is_in_exp_dir, path = False, None
+        return is_in_exp_dir, path
 
     def get_image_paths(self, image_id):
         """
@@ -219,6 +235,9 @@ class BaseAnnotationExperiment(BaseExperiment):
         for i in range(2 + self.get("max_nb_extra_channels")):
             path = image_data.iloc[0, i + 1]
             if isinstance(path, str):
+                # If image is in the proj dir, then construct the absolute path:
+                if not os.path.isabs(path):
+                    path = os.path.join(self.experiment_directory, path)
                 out_dict[ch_names[i]] = path
         return out_dict
 
@@ -244,12 +263,18 @@ class BaseAnnotationExperiment(BaseExperiment):
         # Validate main image path:
         assert os.path.isfile(main_image_path), "'{}' is not a file!"
 
+        # Convert to relative, if in proj_directory:
+        _, main_image_path = self.is_path_in_exp_dir(main_image_path)
+
         def validate_ch_paths(ch_path, name_filter):
             ch_path = None if ch_path == "" else ch_path
             name_filter = None if name_filter == "" else name_filter
             if ch_path is not None:
                 assert os.path.isfile(ch_path), "'{}' is not a file!"
+                # Convert to relative, if in proj_directory:
+                _, ch_path = self.is_path_in_exp_dir(ch_path)
             else:
+                print("WARNING: filename filters outdated. No support for relative paths in proj dir")
                 if name_filter is not None:
                     assert isinstance(main_image_filter,
                                       str) and main_image_filter != "", "Please insert a proper filter string for main image"
@@ -312,6 +337,10 @@ class BaseAnnotationExperiment(BaseExperiment):
     def _init_input_images_df(self):
         if self._input_images_df is None:
             input_images_csv_path = os.path.join(self.experiment_directory, "ROIs/input_images.csv")
+            columns_names = ["image_id",
+                             "main_path",
+                             "DAPI_path"]
+            columns_names += ["extra_ch_{}_path".format(i) for i in range(self.get("max_nb_extra_channels"))]
             if os.path.exists(input_images_csv_path):
                 self._input_images_df = pandas.read_csv(input_images_csv_path, index_col=None)
                 # TODO: remove image_id...?
@@ -320,10 +349,6 @@ class BaseAnnotationExperiment(BaseExperiment):
                 # Make sure that index and image ID are the same, otherwise adding images will not work properly:
                 assert all([idx == row["image_id"] for idx, row in self._input_images_df.iterrows()])
             else:
-                columns_names = ["image_id",
-                                 "main_path",
-                                 "DAPI_path"]
-                columns_names += ["extra_ch_{}_path".format(i) for i in range(self.get("max_nb_extra_channels"))]
                 self._input_images_df = pandas.DataFrame(columns=columns_names)
 
     # --------------------------------------------
@@ -358,19 +383,21 @@ class BaseAnnotationExperiment(BaseExperiment):
             if self.use_dapi_channel_for_segmentation and img_channels[1] is not None:
                 cellpose_image[..., 2] = img_channels[1][..., 0]
 
-            # TODO: improve implementation exposing parameters to GUI?
+            # TODO: improve preproc implementation exposing parameters to GUI?
             # Check if I should apply any preprocessing:
             preproc_kwargs = self.get("preprocessing")
             if preproc_kwargs is not None:
                 print("INFO: Preprocessing image...")
-                cellpose_image[..., 1] = apply_preprocessing_to_image(cellpose_image[..., 1], "main", preproc_kwargs)
-                cellpose_image[..., 2] = apply_preprocessing_to_image(cellpose_image[..., 2], "DAPI", preproc_kwargs)
+                cellpose_image[..., 1] = apply_preprocessing_to_image(cellpose_image[..., 1], "main_segm_ch",
+                                                                      preproc_kwargs)
+                if self.use_dapi_channel_for_segmentation:
+                    cellpose_image[..., 2] = apply_preprocessing_to_image(cellpose_image[..., 2], "DAPI",
+                                                                          preproc_kwargs)
 
             # Write image:
             # tifffile.imwrite(roi_paths["cellpose_training_input_image"], cellpose_image)
             write_image_to_file(roi_paths["cellpose_training_input_image"], cellpose_image)
             # write_ome_tiff(roi_paths["cellpose_training_input_image"], cellpose_image, axes="YX")
-
 
             # ----------------------------
             # Write composite and single-channel cropped images:
@@ -491,11 +518,10 @@ class BaseAnnotationExperiment(BaseExperiment):
         training_folder = os.path.join(self.experiment_directory, "CellposeTraining", model_name)
         training_images_dir = os.path.join(training_folder, "training_images")
 
-        # FIXME: temporary
-        all_rois = self._rois_df["roi_id"].tolist()
-        print(all_rois)
-        self._create_training_images(all_rois)
-
+        # # FIXME: temporary
+        # all_rois = self._rois_df["roi_id"].tolist()
+        # print(all_rois)
+        # self._create_training_images(all_rois)
 
         # Create dirs, if not already present:
         os.makedirs(training_folder, exist_ok=True)
@@ -546,12 +572,8 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         start_cellpose_training(train_folder,
                                 *training_config.get("cellpose_args", []),
-                                out_models_folder=os.path.split(train_folder)[0],
+                                # out_models_folder=os.path.split(train_folder)[0],
                                 **training_config.get("cellpose_kwargs", {}))
-
-        # TODO: do I need to create model folder?
-        # TODO: get train dir and out dir for models
-        # os.makedirs(os.path.join(training_folder, "trained_model"), exist_ok=True)
 
     def update_main_training_config(self,
                                     model_name,
@@ -611,10 +633,10 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         cellpose_kwargs["pretrained_model"] = "cyto2"
         cellpose_kwargs["save_every"] = 10
-        cellpose_kwargs["learning_rate"] = 0.002
+        cellpose_kwargs["learning_rate"] = 0.0002
         cellpose_kwargs["chan"] = 2
         cellpose_kwargs["chan2"] = 1
-        cellpose_kwargs["n_epochs"] = 500
+        cellpose_kwargs["n_epochs"] = 2000
         cellpose_kwargs["batch_size"] = 8
         cellpose_kwargs["mask_filter"] = "_masks"
 
@@ -646,6 +668,17 @@ class BaseAnnotationExperiment(BaseExperiment):
         """Directory for the experiment."""
         return self._experiment_directory
 
+    def set_default_preprocessing_config(self):
+        preproc_config = {"main_segm_ch":
+                              [{"function_kwargs": {},
+                                "function_name": "traincellpose.preprocessing.normalize_image"
+                                }],
+                          "DAPI": []
+                          }
+
+        self.set("preprocessing", preproc_config)
+        self.dump_configuration()
+
     @property
     def qupath_directory(self):
         return os.path.join(self.experiment_directory, 'QuPathProject')
@@ -655,6 +688,7 @@ class BaseAnnotationExperiment(BaseExperiment):
         if value is not None:
             # Make directories
             os.makedirs(os.path.join(value, 'Configurations'), exist_ok=True)
+            os.makedirs(os.path.join(value, 'input_images'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs/ROI_images/composite'), exist_ok=True)
             os.makedirs(os.path.join(value, 'ROIs/ROI_images/single_channels'), exist_ok=True)

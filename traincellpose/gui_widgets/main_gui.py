@@ -11,6 +11,7 @@ from magicgui.widgets import (
 
 from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
+from ..qupath.update_qupath_proj import update_paths_images_in_project
 
 
 def show_message_pop_up(info_message: str):
@@ -108,7 +109,12 @@ class StartingGUI(Container):
         else:
             labeling_tool = self.labeling_tool_combobox.value
             if labeling_tool == "QuPath":
-                # Launch QuPath:
+                # Check if ROIs paths in QuPath should be updated:
+                update_paths_images_in_project(self.project.qupath_directory,
+                                               self.project.experiment_directory,
+                                               ("ROIs", "ROI_images", "composite"))
+
+                # Start QuPath:
                 python_interpreter = sys.executable
                 open_qupath_command = "{} -m paquo {} open {}".format(
                     python_interpreter,

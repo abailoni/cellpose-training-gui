@@ -44,8 +44,9 @@ def add_image_to_project(qupath_proj_dir, image_path):
 
 def update_paths_images_in_project(qupath_proj_dir,
                                    proj_dir,
-                                   rel_path_in_proj="ROIs/ROI_images/composite"):
+                                   rel_path_in_proj=("ROIs", "ROI_images", "composite")):
     assert paquo is not None, "Paquo library is required to interact with QuPath project"
+    assert isinstance(rel_path_in_proj, (list, tuple))
 
     proj_dir = proj_dir if isinstance(proj_dir, Path) else Path(proj_dir)
 
@@ -61,7 +62,7 @@ def update_paths_images_in_project(qupath_proj_dir,
 
             # Check if project folder has changed:
             if proj_dir not in Path(folder_path).parents:
-                new_path = os.path.join(proj_dir, rel_path_in_proj, image_name)
+                new_path = os.path.join(proj_dir, *rel_path_in_proj, image_name)
                 assert os.path.isfile(new_path), "QuPath image not found!"
                 qp.update_image_paths(uri2uri={uri: qp._image_provider.uri(new_path)})
 

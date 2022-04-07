@@ -107,12 +107,11 @@ class RoiSelectionWidget(Container):
             # Otherwise, show info message:
             self._setup_gui(info_message="Path to main channel not existing!")
 
-        self.extend(self.get_list_path_widgets())
-        self.append(load_images_button)
 
         # ----------------------------
         # If an image in the project was selected, load data in the viewer:
         # ----------------------------
+        path_widgets_to_show = []
         if self.image_id is not None:
             image_paths = self.main_gui.project.get_image_paths(image_id=self.image_id)
 
@@ -120,7 +119,13 @@ class RoiSelectionWidget(Container):
                 if ch_name in image_paths:
                     path = Path(image_paths[ch_name])
                     wid.value = path
+                    path_widgets_to_show.append(wid)
                     # print(path.resolve().as_posix(), wid.value)
+        else:
+            path_widgets_to_show = self.get_list_path_widgets()
+
+        self.extend(path_widgets_to_show)
+        self.append(load_images_button)
 
         # Now load images in the viewer:
         self.load_images_in_viewer()
