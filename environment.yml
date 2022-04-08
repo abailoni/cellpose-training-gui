@@ -3,18 +3,34 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python
-  - numpy
-  - pandas
+#  Core dependencies:
+  - python>=3.8.5 # Version required by cellpose
   - scipy
   - h5py
   - imageio
   - opencv
-  - napari
-  - magicgui # Probably already included in napari
-  - pyqt
-  - abailoni::speedrun
-  - abailoni::paquo #  QuPath dependencies: TODO: create a QuPath flag?
+  - tifffile
   - ome-zarr
-    # For cellpose
+  - abailoni::speedrun
+# GUI dependencies:
+  - napari
+  - magicgui
+  - pyqt
+  - sdvillal::qupath
+  - abailoni::paquo
+# Cellpose dependencies:
+  - pytorch::pytorch>=1.6
   - numba
+  - mkl < 2022
+  - scikit-learn
+  - scikit-image
+  - pip
+  - pip:
+    - opencv-python-headless
+    - natsort
+    - tqdm
+    - fastremap
+    - edt
+    - torch_optimizer
+    - ncolor
+    - cellpose

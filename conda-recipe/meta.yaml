@@ -15,27 +15,27 @@ requirements:
     - pip
   run:
     - python {{ python }}
-    - numpy
-    - pandas
     - scipy
     - h5py
     - imageio
     - opencv
+    - speedrun
+    - tifffile
+    - ome-zarr
     - napari
     - magicgui # Probably already included in napari
     - pyqt
-    - speedrun
-    - paquo #  QuPath dependency: TODO: create a QuPath flag?
-    - ome-zarr
+    - paquo #  QuPath dependency
     # For cellpose
-    - numba
+#    - numba
+
 
 test:
   imports:
     - traincellpose
     - traincellpose.core
     - traincellpose.napari_gui.roi_selection
-    - paquo #  QuPath dependency: TODO: create a QuPath flag?
+    - paquo #  QuPath dependency
   source_files:
     - tests/**/*.py
   commands:
