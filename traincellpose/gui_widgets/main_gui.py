@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 import napari
@@ -9,6 +10,7 @@ from magicgui.widgets import (
     PushButton,
 )
 
+from ..io.various import open_path
 from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
 from ..qupath.update_qupath_proj import update_paths_images_in_project
@@ -37,17 +39,17 @@ class StartingGUI(Container):
         self.project = annotation_project
         # self.max_width = 300
         self.roi_select_viewer = None
+        self.labeling_tool_combobox = None
         self.show_starting_gui()
 
     def show_starting_gui(self):
         self.clear()
 
-        select_rois_button = PushButton(name="select_rois", text="Select Regions of Interest")
+        select_rois_button = PushButton(name="select_rois", text="Select Regions of Interest (ROIs) in Napari")
         select_rois_button.changed.connect(self.show_roi_selection_gui)
 
-        # TODO: add attributes to init
         self.labeling_tool_combobox = widgets.ComboBox(
-            label="using",
+            label="using:",
             choices=["QuPath", "Napari"],
             value=self.project.get("labeling_tool")
         )
@@ -57,34 +59,56 @@ class StartingGUI(Container):
             self.project.set("labeling_tool", new_value)
             self.project.dump_configuration()
 
-        label_rois_button = PushButton(name="label_rois", text="Manually Annotate")
+        label_rois_button = PushButton(name="label_rois", text="Annotate ROIs")
         label_rois_button.changed.connect(self.show_roi_labeling_gui)
+
+        qupath_zip_button = PushButton(name="qupath_zip", text="Export QuPath Project (.zip)")
+        see_cellpose_input_button = PushButton(name="see_cellpose_input", text="Show Cellpose Input Images")
         # get_qupath_labels_button = PushButton(name="get_qupath_labels", text="Manually Annotate in QuPath")
         # get_qupath_labels_button.changed.connect(self.start_qupath)
-        train_button = PushButton(name="start_training", text="Train Cellpose Model")
+        train_button = PushButton(name="start_training", text="Configure Training of Custom Cellpose Model")
         train_button.changed.connect(self.show_training_gui)
 
-        labels = widgets.Container(widgets=[widgets.Label(value="Step 1:"),
-                                            widgets.Label(value="Step 2:"),
-                                            widgets.Label(value="Step 3:")])
-        column_1 = widgets.Container(widgets=[select_rois_button,
-                                              label_rois_button,
-                                              train_button])
+        @see_cellpose_input_button.changed.connect
+        def see_cellpose_input():
+            rois_list = self.project.get_roi_list()
+            if len(rois_list) == 0:
+                show_message_pop_up("No region of interest has been selected yet")
+            else:
+                self.project.show_cellpose_input_folder()
 
-        widgest_to_diplay = widgets.Container(widgets=[widgets.Label(value=""),
-                                                       self.labeling_tool_combobox,
-                                                       widgets.Label(value=""),
-                                                       ])
+        @qupath_zip_button.changed.connect
+        def qupath_zip():
+            rois_list = self.project.get_roi_list()
+            if len(rois_list) == 0:
+                show_message_pop_up("No region of interest has been selected yet")
+            else:
+                self.project.compress_qupath_proj_dir()
 
-        button_container = widgets.Container(layout="horizontal",
-                                             widgets=[labels, column_1, widgest_to_diplay],
-                                             # label="Select one option:"
-                                             )
 
-        # button_container = widgets.Container(layout="vertical",
-        #                                      widgets=widgest_to_diplay,
-        #                                      # label="Select one option:"
-        #                                      )
+
+        row_1 = widgets.Container(
+            label="Step 1:",
+            layout="horizontal",
+            widgets=[select_rois_button]
+        )
+        row_1b = widgets.Container(
+            label="",
+            layout="horizontal",
+            widgets=[qupath_zip_button, see_cellpose_input_button]
+        )
+        row_2 = widgets.Container(
+            label="Step 2:",
+            layout="horizontal",
+            widgets=[label_rois_button, self.labeling_tool_combobox]
+        )
+        row_3 = widgets.Container(
+            label="Step 3:",
+            layout="horizontal",
+            widgets=[train_button]
+        )
+
+        button_container = widgets.Container(widgets=[row_1, row_1b, row_2, row_3])
 
         self.extend([
             button_container])
@@ -112,7 +136,7 @@ class StartingGUI(Container):
                 # Check if ROIs paths in QuPath should be updated:
                 update_paths_images_in_project(self.project.qupath_directory,
                                                self.project.experiment_directory,
-                                               ("ROIs", "ROI_images", "composite"))
+                                               ("QuPathProject", "input_images"))
 
                 # Start QuPath:
                 python_interpreter = sys.executable
@@ -122,7 +146,15 @@ class StartingGUI(Container):
                     self.project.qupath_directory
                 )
                 print(open_qupath_command)
-                os.system(open_qupath_command)
+                try:
+                    subprocess.run(open_qupath_command, shell=True, check=True)
+                    # result = subprocess.run(open_qupath_command, shell=True, check=True, capture_output=True, text=True)
+                    # print(result.stdout)
+                    # print(result.stderr)
+                except subprocess.CalledProcessError:
+                    self.show_starting_gui()
+                    show_message_pop_up("QuPath could not be started. Make sure that it is installed.")
+                    pass
             elif labeling_tool == "Napari":
                 # Create a napari viewer with an additional widget:
                 # FIXME: update name of the attribute: simply napari-viewer?
@@ -179,6 +211,21 @@ class StartingGUI(Container):
                 value=training_params["pretrained_model_GUI"]
             )
 
+            # Use DAPI for training:
+            self.use_dapi_for_training = widgets.CheckBox(
+                name="use_dapi",
+                tooltip="Check it if you want to use DAPI channel during training",
+                text="Use DAPI channel for training",
+                value=self.project.use_dapi_channel_for_segmentation,
+            )
+
+            @self.use_dapi_for_training.changed.connect
+            def use_dapi_for_training():
+                print(self.use_dapi_for_training.value)
+                self.project.use_dapi_channel_for_segmentation = self.use_dapi_for_training.value
+                # Recompute training images:
+                self.project.refresh_all_training_images()
+
             # Custom model path:
             self.custom_model_path = widgets.FileEdit(
                 name="main_channel",
@@ -216,30 +263,37 @@ class StartingGUI(Container):
             )
 
             setup_training_data_button = PushButton(name="setup_training_data",
-                                                    text="Setup training data and save training config")
-            start_training_button = PushButton(name="start_training", text="Start training")
+                                                    text="Prepare and Export Cellpose Training Data (.zip)")
+            start_training_button = PushButton(name="start_training", text="Start Training (requires local GPU)")
 
             @setup_training_data_button.changed.connect
             def setup_training_data():
                 if self.is_valid_training_config():
-                    self.project.setup_cellpose_training_data(self.model_name.value)
+                    self.project.setup_cellpose_training_data(self.model_name.value, show_training_folder=True)
 
             @start_training_button.changed.connect
             def start_training():
                 if self.is_valid_training_config():
-                    self.project.run_cellpose_training(self.model_name.value)
+                    training_was_successful, error_message = self.project.run_cellpose_training(self.model_name.value)
+                    message = "Model training completed!" if training_was_successful else error_message
+                    show_message_pop_up(message)
 
             self.extend([
                 self.model_name,
                 self.pretrained_model,
                 self.custom_model_path,
                 self.n_epochs,
+                # widgets.Container(layout="horizontal", widgets=[self.n_epochs, self.use_dapi_for_training],
+                #                   label="Number of epochs"),
                 self.batch_size,
                 self.learning_rate,
+                # widgets.Container(widgets=[self.use_dapi_for_training], label=""),
+                # widgets.Container(widgets=[self.use_dapi_for_training]),
+                self.use_dapi_for_training,
+                widgets.Label(label=""),
                 setup_training_data_button,
                 start_training_button,
                 close_button,
-
             ])
 
     def is_valid_training_config(self):

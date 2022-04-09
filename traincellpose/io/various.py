@@ -1,5 +1,6 @@
 import os
-
+import platform
+import subprocess
 import yaml
 
 
@@ -23,3 +24,12 @@ def get_path_components(path):
             break
     folders.reverse()
     return folders
+
+
+def open_path(path):
+    if platform.system() == "Windows":
+        os.startfile(path)
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])

@@ -53,7 +53,7 @@ class RoiSelectionWidget(Container):
 
         # selected_image_container = widgets.Container(widgets=[selected_image])
         self.append(self.selected_image)
-        self.append(widgets.Container())
+        # self.append(widgets.Container())
 
         # ----------------------------
         # Create interface to enter channels file paths:
@@ -78,7 +78,10 @@ class RoiSelectionWidget(Container):
         )
 
         # Add button to load the channels and save them in the project:
-        load_images_button = PushButton(name="load_images", text="Update Image Channels")
+        load_images_button = PushButton(name="load_images",
+                                        text="Update Image Channels" if self.image_id is not None else
+                                        "Load Image and Add it to the Project")
+        add_new_image_button = PushButton(name="add_image", text="Add new image to project")
 
         @load_images_button.changed.connect
         def update_image_paths():
@@ -107,6 +110,15 @@ class RoiSelectionWidget(Container):
             # Otherwise, show info message:
             self._setup_gui(info_message="Path to main channel not existing!")
 
+        @add_new_image_button.changed.connect
+        def add_new_image():
+            # First update ROIs, if user forgot:
+            if self.image_id is not None:
+                self.update_rois()
+
+            # Then show interface to add new image:
+            self.image_id = None
+            self._setup_gui()
 
         # ----------------------------
         # If an image in the project was selected, load data in the viewer:
@@ -141,7 +153,11 @@ class RoiSelectionWidget(Container):
             self.update_rois()
 
         if self.image_id is not None:
-            self.extend([update_rois_button])
+            self.extend([update_rois_button,
+                         widgets.Label(label=""),
+                         add_new_image_button])
+        else:
+            self.append(widgets.Label(label=""))
 
         # Button to go back to the main
         close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")

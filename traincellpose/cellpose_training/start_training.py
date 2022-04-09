@@ -18,7 +18,9 @@ def start_cellpose_training(train_folder,
     """
     :param cellpose_args: List of strings that should be passed to cellpose (those arguments that do not require a specific value)
     """
-    assert cellpose is not None, "Cellpose module is needed to training a new segmentation model"
+    if cellpose is None:
+        return False, "cellpose module is required to train a custom model"
+
     # Compose the command to be run:
     # TODO: move fast_mode to config?
     python_interpreter = sys.executable
@@ -41,7 +43,10 @@ def start_cellpose_training(train_folder,
         command += "--{} {} ".format(kwarg, cellpose_kwargs[kwarg])
 
     print(command)
-    subprocess.run(command, shell=True, check=True)
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError:
+        return False, "Some errors occurred during training"
 
     if out_models_folder is not None:
         os.makedirs(out_models_folder, exist_ok=True)
@@ -55,3 +60,5 @@ def start_cellpose_training(train_folder,
 
         # Now delete the original folder:
         shutil.rmtree(cellpose_out_model_dir)
+
+    return True, None

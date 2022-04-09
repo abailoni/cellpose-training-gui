@@ -16,35 +16,37 @@ except ImportError:
 from pathlib import Path
 
 
-def add_image_to_project(qupath_proj_dir, image_path):
+def add_image_to_project(qupath_proj_dir, image_path=None):
     assert paquo is not None, "Paquo library is required to interact with QuPath project"
-    if not isinstance(image_path, Path):
-        assert isinstance(image_path, str)
-        image_path = Path(image_path)
 
     with QuPathProject(qupath_proj_dir, mode="a") as qp:
-        # Check if image is already in QuPath project:
-        add_new_image = True
-        img_id = qp._image_provider.id(qp._image_provider.uri(image_path))
-        for entry in qp.images:
-            uri = qp._image_provider.id(entry.uri)
-            if img_id == uri:
-                add_new_image = False
-                break
+        if image_path is not None:
+            if not isinstance(image_path, Path):
+                assert isinstance(image_path, str)
+                image_path = Path(image_path)
 
-        # Now add it to the project:
-        if add_new_image:
-            qp.add_image(image_path, image_type=QuPathImageType.OTHER, allow_duplicates=False)
-            # new_entry.metadata = {
-            #         "annotator": "Alice",
-            #         "status": "finished",
-            #         "diagnosis": "healthy",
-            # }
+            # Check if image is already in QuPath project:
+            add_new_image = True
+            img_id = qp._image_provider.id(qp._image_provider.uri(image_path))
+            for entry in qp.images:
+                uri = qp._image_provider.id(entry.uri)
+                if img_id == uri:
+                    add_new_image = False
+                    break
+
+            # Now add it to the project:
+            if add_new_image:
+                qp.add_image(image_path, image_type=QuPathImageType.OTHER, allow_duplicates=False)
+                # new_entry.metadata = {
+                #         "annotator": "Alice",
+                #         "status": "finished",
+                #         "diagnosis": "healthy",
+                # }
 
 
 def update_paths_images_in_project(qupath_proj_dir,
                                    proj_dir,
-                                   rel_path_in_proj=("ROIs", "ROI_images", "composite")):
+                                   rel_path_in_proj=("QuPathProject", "input_images")):
     assert paquo is not None, "Paquo library is required to interact with QuPath project"
     assert isinstance(rel_path_in_proj, (list, tuple))
 
@@ -54,7 +56,8 @@ def update_paths_images_in_project(qupath_proj_dir,
         for entry in qp.images:
             uri = entry.uri
             folder_uri, image_name = os.path.split(uri)
-            assert "ROIs" in folder_uri and "ROI_images" in folder_uri
+            for rel_dir in rel_path_in_proj:
+                assert rel_dir in folder_uri
 
             # Parse path of the image:
             p = urlparse(folder_uri)
@@ -80,8 +83,3 @@ def delete_image_from_project(qupath_proj_dir, image_id):
         qp.remove_image(image_entry_id)
 
 
-if __name__ == '__main__':
-    update_paths_images_in_project(
-        "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project3/QuPathProject/project.qpproj",
-        "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project3"
-    )

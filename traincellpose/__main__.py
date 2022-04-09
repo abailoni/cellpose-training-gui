@@ -28,7 +28,9 @@ def start_training_func(args):
     model_name = args.model_name
     exp = BaseAnnotationExperiment(proj_dir_path)
     # print("test")
-    exp.run_cellpose_training(model_name)
+    training_was_successful, error_message = exp.run_cellpose_training(model_name)
+    if not training_was_successful:
+        raise Exception(error_message)
 
 
 def setup_training_func(args):
