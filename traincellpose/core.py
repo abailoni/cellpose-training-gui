@@ -219,9 +219,9 @@ class BaseAnnotationExperiment(BaseExperiment):
             path = path if isinstance(path, Path) else Path(path)
             is_in_exp_dir = Path(self.experiment_directory) in path.parents
             path = os.path.relpath(path, self.experiment_directory) if is_in_exp_dir else path
+            return is_in_exp_dir, str(path)
         else:
-            is_in_exp_dir, path = False, None
-        return is_in_exp_dir, path
+            return False, None
 
     def get_image_paths(self, image_id):
         """
