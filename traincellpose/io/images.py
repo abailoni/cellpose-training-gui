@@ -49,7 +49,6 @@ def write_ome_tiff(path, data, axes='TCZYX',
         assert isinstance(channel_colors, (tuple, list))
         assert all([color in colormaps for color in channel_colors]), "Color not recognised"
         metadata["Channel"]["Color"] = [rgba_to_int(*colormaps[color]) for color in channel_colors]
-        print(metadata["Channel"]["Color"])
 
     tifffile.imwrite(
         path, data, metadata=metadata

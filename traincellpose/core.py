@@ -419,7 +419,6 @@ class BaseAnnotationExperiment(BaseExperiment):
             for i, ch_image in enumerate(img_channels):
                 if ch_image is not None:
                     write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
-            print([ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if ch is not None])
             write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX",
                            channel_names=[ch_name for ch_name, ch in zip(ch_names, img_channels) if ch is not None],
                            channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if
