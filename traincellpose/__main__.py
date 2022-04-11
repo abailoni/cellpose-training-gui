@@ -44,7 +44,7 @@ def setup_training_func(args):
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--proj_dir', required=False, default=None, type=str, help='Project directory to load')
+    parser.add_argument('-d', '--proj_dir', required=False, default=None, type=str, help='Project directory to load')
     parser.set_defaults(func=run_GUI)
 
     subparsers = parser.add_subparsers(dest='subparser')

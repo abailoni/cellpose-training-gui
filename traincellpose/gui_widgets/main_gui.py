@@ -140,7 +140,7 @@ class StartingGUI(Container):
 
                 # Start QuPath:
                 python_interpreter = sys.executable
-                open_qupath_command = "{} -m paquo {} open {}".format(
+                open_qupath_command = '"{}" -m paquo {} open "{}"'.format(
                     python_interpreter,
                     "--" if "ipython" in python_interpreter else "",
                     self.project.qupath_directory

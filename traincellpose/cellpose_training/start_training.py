@@ -25,13 +25,13 @@ def start_cellpose_training(train_folder,
     # TODO: move fast_mode to config?
     python_interpreter = sys.executable
     CUDA_VISIBLE_DEVICES = os.environ["CUDA_VISIBLE_DEVICES"] if "CUDA_VISIBLE_DEVICES" in os.environ else "0"
-    command = "{} {} -m cellpose {} --train" \
-              " --use_gpu --fast_mode --dir {} {} ".format(
+    command = '"{}" {} -m cellpose {} --train' \
+              ' --use_gpu --fast_mode --dir "{}" {} '.format(
         "CUDA_VISIBLE_DEVICES=" + CUDA_VISIBLE_DEVICES,
         python_interpreter,
         "--" if "ipython" in python_interpreter else "",
         train_folder,
-        "" if test_folder is None else "--test_dir {}".format(test_folder),
+        "" if test_folder is None else '--test_dir "{}"'.format(test_folder),
     )
     # Add the args:
     for arg in cellpose_args:

@@ -36,8 +36,3 @@ def export_labels_from_qupath(qupath_proj_dir, out_folder, filename_postfix=None
             QP.writeImage(out_labels, JavaString(os.path.join(out_folder, image_name)))
 
 
-if __name__ == '__main__':
-    export_labels_from_qupath(
-        "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project/QuPathProject/project.qpproj",
-        "/Users/alberto-mac/EMBL_ATeam/cellpose_training_pipeline/test_project/QuPathProject/export"
-    )
