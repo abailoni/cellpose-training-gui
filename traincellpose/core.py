@@ -362,7 +362,11 @@ class BaseAnnotationExperiment(BaseExperiment):
     # --------------------------------------------
     # Image crops defined from ROIs and used for training:
     # --------------------------------------------
-    def _create_training_images(self, list_roi_ids):
+    def _create_training_images(self, list_roi_ids,
+                                update_single_channels=True,
+                                update_composite_images=True,
+                                update_cellpose_inputs=True
+                                ):
         """
         Create the actual cropped images that will be used for training and for annotation.
         """
@@ -383,29 +387,29 @@ class BaseAnnotationExperiment(BaseExperiment):
             # ----------------------------
             # Cellpose training image:
             # ----------------------------
-            # Set green channel as main channel:
-            cellpose_image = np.zeros_like(img_channels[0])
-            cellpose_image[..., 1] = img_channels[0][..., 0]
+            if update_cellpose_inputs:
+                # Set green channel as main channel:
+                cellpose_image = np.zeros_like(img_channels[0])
+                cellpose_image[..., 1] = img_channels[0][..., 0]
 
-            # Set red channel as DAPI:
-            if self.use_dapi_channel_for_segmentation and img_channels[1] is not None:
-                cellpose_image[..., 2] = img_channels[1][..., 0]
+                # Set red channel as DAPI:
+                if self.use_dapi_channel_for_segmentation and img_channels[1] is not None:
+                    cellpose_image[..., 2] = img_channels[1][..., 0]
 
-            # TODO: improve preproc implementation exposing parameters to GUI?
-            # Check if I should apply any preprocessing:
-            preproc_kwargs = self.get("preprocessing")
-            if preproc_kwargs is not None:
-                print("INFO: Preprocessing image...")
-                cellpose_image[..., 1] = apply_preprocessing_to_image(cellpose_image[..., 1], "main_segm_ch",
-                                                                      preproc_kwargs)
-                if self.use_dapi_channel_for_segmentation:
-                    cellpose_image[..., 2] = apply_preprocessing_to_image(cellpose_image[..., 2], "DAPI",
+                # Check if I should apply any preprocessing:
+                preproc_kwargs = self.get("preprocessing")
+                if preproc_kwargs is not None and self.apply_preprocessing:
+                    print("INFO: Preprocessing image...")
+                    cellpose_image[..., 1] = apply_preprocessing_to_image(cellpose_image[..., 1], "main_segm_ch",
                                                                           preproc_kwargs)
+                    if self.use_dapi_channel_for_segmentation:
+                        cellpose_image[..., 2] = apply_preprocessing_to_image(cellpose_image[..., 2], "DAPI",
+                                                                              preproc_kwargs)
 
-            # Write image:
-            # tifffile.imwrite(roi_paths["cellpose_training_input_image"], cellpose_image)
-            write_image_to_file(roi_paths["cellpose_training_input_image"], cellpose_image)
-            # write_ome_tiff(roi_paths["cellpose_training_input_image"], cellpose_image, axes="YX")
+                # Write image:
+                # tifffile.imwrite(roi_paths["cellpose_training_input_image"], cellpose_image)
+                write_image_to_file(roi_paths["cellpose_training_input_image"], cellpose_image)
+                # write_ome_tiff(roi_paths["cellpose_training_input_image"], cellpose_image, axes="YX")
 
             # ----------------------------
             # Write composite and single-channel cropped images:
@@ -415,23 +419,26 @@ class BaseAnnotationExperiment(BaseExperiment):
             # TODO: make general variable
             channel_colormaps = ["gray", "red", "yellow", "cyan"]
 
-            composite_image = np.stack([ch_image[..., 0] for ch_image in img_channels if ch_image is not None], axis=0)
-            for i, ch_image in enumerate(img_channels):
-                if ch_image is not None:
-                    write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
-            write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX",
-                           channel_names=[ch_name for ch_name, ch in zip(ch_names, img_channels) if ch is not None],
-                           channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if
-                                           ch is not None],
-                           )
+            if update_single_channels:
+                for i, ch_image in enumerate(img_channels):
+                    if ch_image is not None:
+                        write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
 
-            # Finally, add the image to the QuPath project:
-            qupath_utils.add_image_to_project(self.qupath_directory,
-                                              roi_paths["composite_image"])
+            if update_composite_images:
+                composite_image = np.stack([ch_image[..., 0] for ch_image in img_channels if ch_image is not None], axis=0)
+                write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX",
+                               channel_names=[ch_name for ch_name, ch in zip(ch_names, img_channels) if ch is not None],
+                               channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if
+                                               ch is not None],
+                               )
 
-    def refresh_all_training_images(self):
+                # Finally, add the image to the QuPath project:
+                qupath_utils.add_image_to_project(self.qupath_directory,
+                                                  roi_paths["composite_image"])
+
+    def refresh_all_training_images(self, **kwargs):
         all_rois = self._rois_df["roi_id"].tolist()
-        self._create_training_images(all_rois)
+        self._create_training_images(all_rois, **kwargs)
 
     def _delete_training_images(self, list_roi_ids):
         """
@@ -672,12 +679,28 @@ class BaseAnnotationExperiment(BaseExperiment):
     # --------------------------------------------
     @property
     def use_dapi_channel_for_segmentation(self):
-        return self.get("training/use_dapi_channel_for_segmentation", False)
+        if self.get("training/use_dapi_channel_for_segmentation") is None:
+            self.use_dapi_channel_for_segmentation = True
+        return self.get("training/use_dapi_channel_for_segmentation")
 
     @use_dapi_channel_for_segmentation.setter
     def use_dapi_channel_for_segmentation(self, use_dapi_channel_for_segmentation):
         assert isinstance(use_dapi_channel_for_segmentation, bool)
         self.set("training/use_dapi_channel_for_segmentation", use_dapi_channel_for_segmentation)
+        self.dump_configuration()
+
+    @property
+    def apply_preprocessing(self):
+        if self.get("apply_preprocessing") is None:
+            self.apply_preprocessing = False
+        return self.get("apply_preprocessing")
+
+    @apply_preprocessing.setter
+    def apply_preprocessing(self, apply_preprocessing):
+        assert isinstance(apply_preprocessing, bool)
+        self.set("apply_preprocessing", apply_preprocessing)
+        self.dump_configuration()
+
 
     def record_args(self):
         # Simulate sys.argv, so that configuration is loaded from the experiment directory:

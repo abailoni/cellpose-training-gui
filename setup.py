@@ -12,5 +12,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     version="0.1.2",
     packages=setuptools.find_packages(),
+    entry_points = {
+        'console_scripts': [
+          'traincellpose = traincellpose.__main__:main']
+    }
 )
 

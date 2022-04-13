@@ -85,8 +85,6 @@ class StartingGUI(Container):
             else:
                 self.project.compress_qupath_proj_dir()
 
-
-
         row_1 = widgets.Container(
             label="Step 1:",
             layout="horizontal",
@@ -214,8 +212,8 @@ class StartingGUI(Container):
             # Use DAPI for training:
             self.use_dapi_for_training = widgets.CheckBox(
                 name="use_dapi",
-                tooltip="Check it if you want to use DAPI channel during training",
-                text="Use DAPI channel for training",
+                tooltip="Use DAPI channel during training, otherwise it will be ignored",
+                text="Use DAPI channel during training",
                 value=self.project.use_dapi_channel_for_segmentation,
             )
 
@@ -223,8 +221,30 @@ class StartingGUI(Container):
             def use_dapi_for_training():
                 print(self.use_dapi_for_training.value)
                 self.project.use_dapi_channel_for_segmentation = self.use_dapi_for_training.value
-                # Recompute training images:
-                self.project.refresh_all_training_images()
+
+                # Recompute cellpose input images:
+                self.project.refresh_all_training_images(
+                    update_single_channels=False,
+                    update_composite_images=False,
+                    update_cellpose_inputs=True)
+
+            # Use DAPI for training:
+            self.apply_preprocessing = widgets.CheckBox(
+                name="apply_preprocessing",
+                tooltip="Auto-adjust image saturation or apply custom preprocessing from config file",
+                text="Preprocess images before training",
+                value=self.project.apply_preprocessing,
+            )
+
+            @self.apply_preprocessing.changed.connect
+            def apply_preprocessing():
+                self.project.apply_preprocessing = self.apply_preprocessing.value
+
+                # Recompute cellpose input images:
+                self.project.refresh_all_training_images(
+                    update_single_channels=False,
+                    update_composite_images=False,
+                    update_cellpose_inputs=True)
 
             # Custom model path:
             self.custom_model_path = widgets.FileEdit(
@@ -290,6 +310,7 @@ class StartingGUI(Container):
                 # widgets.Container(widgets=[self.use_dapi_for_training], label=""),
                 # widgets.Container(widgets=[self.use_dapi_for_training]),
                 self.use_dapi_for_training,
+                self.apply_preprocessing,
                 widgets.Label(label=""),
                 setup_training_data_button,
                 start_training_button,
