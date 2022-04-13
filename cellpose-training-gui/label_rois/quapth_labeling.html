@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Annotating in QuPath &#8212; Cellpose-training-GUI  documentation</title>
+    
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+    
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
+    
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Train Cellpose Models" href="../cellpose_training/training.html" />
+    <link rel="prev" title="Annotating in Napari" href="napari_labeling.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Cellpose-training-GUI</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../install.html">
+  Getting started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../select_rois.html">
+  Select Regions of Interest
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="label_rois.html">
+  Annotate Regions of Interest
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../cellpose_training/training.html">
+  Train Cellpose Models
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="napari_labeling.html">
+   Annotating in Napari
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Annotating in QuPath
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-started">
+   Getting started
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#starting-qupath">
+     Starting QuPath
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#adjusting-image-channels-contrast">
+     Adjusting image channels contrast
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#viewing-image-channels-one-by-one">
+     Viewing image channels one by one
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#annotating-cells-in-qupath">
+   Annotating cells in QuPath
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#move-tool-panning-and-zooming-shortcut-m">
+     Panning and zooming (shortcut:
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       M
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#brush-tool-brush-tool-shortcut-b">
+     Brush tool (shortcut:
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       B
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#wand-tool-wand-tool-shortcut-w">
+     Wand tool (shortcut:
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       W
+      </span>
+     </code>
+     )
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summary-of-useful-shortcuts">
+     Summary of useful shortcuts
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <a class="reference internal image-reference" href="../../_images/qupath-logo.png"><img alt="QuPath logo" class="align-right" src="../../_images/qupath-logo.png" style="width: 15%;" /></a>
+<section class="tex2jax_ignore mathjax_ignore" id="annotating-in-qupath">
+<h1>Annotating in QuPath<a class="headerlink" href="#annotating-in-qupath" title="Permalink to this headline">¶</a></h1>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../../_images/qupath-starting-interface.jpg"><img alt="QuPath starting interface" class="align-center" src="../../_images/qupath-starting-interface.jpg" style="width: 100%;" /></a>
+<section id="starting-qupath">
+<h3>Starting QuPath<a class="headerlink" href="#starting-qupath" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Once you have selected the regions of interest with the SpaceM Annotator tool, you should close the tool and launch QuPath from the installed applications.</p></li>
+<li><p>In the SpaceM Annotator project folder, you can find a folder named <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code>. To load the regions of interest in QuPath, you should drag this folder into QuPath. Alternatively, you can click on the Menu item <em>File/Projects…/Open Project</em> and open the <code class="docutils literal notranslate"><span class="pre">project.qpproj</span></code> file in the <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code> folder.</p></li>
+<li><p>After loading the project, you should see the list of regions of interest on the left. You can double-click on one image to open it in the viewer.</p></li>
+</ol>
+<p><br/><br/></p>
+<a class="reference internal image-reference" href="../../_images/channel-contrast.jpg"><img alt="Adjust channels contrast" class="align-right" src="../../_images/channel-contrast.jpg" style="width: 35%;" /></a>
+</section>
+<section id="adjusting-image-channels-contrast">
+<h3>Adjusting image channels contrast<a class="headerlink" href="#adjusting-image-channels-contrast" title="Permalink to this headline">¶</a></h3>
+<p>For making the annotation process easier, it may be helpful to adjust the contrast of the image channels. To do so, first load one image and then select the <code class="docutils literal notranslate"><span class="pre">View/Brightness-Contrast</span></code> menu item (or press the <code class="docutils literal notranslate"><span class="pre">Shift+C</span></code> keys).</p>
+<p>From this window, you can select image channels and see the pixel-intensity distribution, adjust the <em>Min display</em> and <em>Max display</em> sliders to adjust the contrast, or changing the colormap of the single image channels.</p>
+<p><br/><br/><br/><br/><br/><br/></p>
+<a class="reference internal image-reference" href="../../_images/channel-viewer.jpg"><img alt="Channel viewer" class="align-right" src="../../_images/channel-viewer.jpg" style="width: 35%;" /></a>
+</section>
+<section id="viewing-image-channels-one-by-one">
+<h3>Viewing image channels one by one<a class="headerlink" href="#viewing-image-channels-one-by-one" title="Permalink to this headline">¶</a></h3>
+<p>If you open the <em>Channel Viewer</em> from the Menu <code class="docutils literal notranslate"><span class="pre">View/Mini</span> <span class="pre">viewers.../Show</span> <span class="pre">channel</span> <span class="pre">viewer</span></code>, you will be able to see each channel of the image singularly.</p>
+<p>This can be very handy when manually annotating.</p>
+<p><br/><br/><br/></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="annotating-cells-in-qupath">
+<h2>Annotating cells in QuPath<a class="headerlink" href="#annotating-cells-in-qupath" title="Permalink to this headline">¶</a></h2>
+<p>When you start annotating cells, you create Annotation objects. The list of the annotated cells can be seen by clicking on the <em>Annotations</em> tab (see image below). You can easily select/delete/merge cell annotations by selecting items in the Annotations list.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Remember that you should label all cells inside a region of interest! And when you are done annotating, do not forget to save your results (&lt;Ctrl+S&gt; keyboard shortcut).</p>
+</div>
+<p>You can find the drawing tools in the top-toolbar of QuPath. For annotating cells, you will only need the following tools: Move, Brush, and Wand.</p>
+<a class="reference internal image-reference" href="../../_images/annotations-list.jpg"><img alt="QuPath starting interface" class="align-center" src="../../_images/annotations-list.jpg" style="width: 100%;" /></a>
+<section id="move-tool-panning-and-zooming-shortcut-m">
+<h3><a class="reference internal" href="../../_images/move-tool.png"><img alt="Move tool" src="../../_images/move-tool.png" style="width: 30px;" /></a>  Panning and zooming (shortcut: <code class="docutils literal notranslate"><span class="pre">M</span></code>)<a class="headerlink" href="#move-tool-panning-and-zooming-shortcut-m" title="Permalink to this headline">¶</a></h3>
+<p>Select the <em>Move tool</em>, then click on the image and drag to move it.</p>
+<p>If another tool is currently selected, press <code class="docutils literal notranslate"><span class="pre">Spacebar</span></code> to temporarily activate the Move tool. Releasing the Spacebar returns to the previously selected tool.</p>
+<p>Alternatively, to move quickly to a specific region simply click on the area you wish to navigate to in the overview shown in the top right corner.</p>
+<p>Use the scroll wheel to zoom in and out (it also works on trackpad). With the touch-screen, you can also use ‘pinch-to-zoom’.</p>
+<p>The location of the cursor determines where will be centered whenever zooming - so it is a good idea to put the cursor on top of the area that you would like to zoom to.</p>
+</section>
+<section id="brush-tool-brush-tool-shortcut-b">
+<h3><a class="reference internal" href="../../_images/brush-tool.jpg"><img alt="Brush tool" src="../../_images/brush-tool.jpg" style="width: 30px;" /></a>  Brush tool (shortcut: <code class="docutils literal notranslate"><span class="pre">B</span></code>)<a class="headerlink" href="#brush-tool-brush-tool-shortcut-b" title="Permalink to this headline">¶</a></h3>
+<p>The Brush tool is probably the drawing tool you will use the most for annotating cells. The idea is simple: each click of the brush selects a small circle, but by dragging the mouse across the image then a region is ‘painted’ that way.</p>
+<p>This would have limited call for excitement, but the <em>Brush tool</em> within QuPath has a few particularly useful features:</p>
+<ul class="simple">
+<li><p><strong>Annotating a new cell</strong>: Simply start drawing in another area of the image and this will automatically create a new annotation object.</p></li>
+<li><p><strong>Updating the annotation of a cell</strong>: Start using the brush inside an existing annotation object/cell and drag the mouse around to extend the annotated area.</p></li>
+<li><p><strong>Eraser:</strong> Holding down the <code class="docutils literal notranslate"><span class="pre">Alt</span></code> key (or <code class="docutils literal notranslate"><span class="pre">Option</span></code> key on Mac) while using the brush causes it to ‘subtract’ regions… basically acting as an eraser (or painterly equivalent).</p></li>
+<li><p><strong>Adaptive brush size</strong>: <em>The size of the brush adapts according to magnification.</em> In other words, if you zoom in then the brush effectively paints small regions - while zoomed out it can quickly mark in large areas (you can change the absolute size of the brush in the settings, and also optionally turn off the size adaption according to zoom).</p></li>
+<li><p><strong>Avoid overlapping segments</strong>: If you have two cells that touch each other’s, but you want to avoid having overlapping annotations, there is a very convenient function in QuPath that can help. First, paint the first cell; then, create another annotation for the second cell without worrying about <em>overshooting</em> borders and creating overlapping areas; when you are done, you can hold the <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> keys (<code class="docutils literal notranslate"><span class="pre">Cmd+Shift</span></code> on Mac) and click with the digital pen inside the second cell: this will automatically remove areas overlapping with other annotations.</p></li>
+<li><p><strong>Undo the last change</strong>: You find the option in the <code class="docutils literal notranslate"><span class="pre">Edit</span></code> menu or you can simply press <code class="docutils literal notranslate"><span class="pre">Ctrl+Z</span></code> key (<code class="docutils literal notranslate"><span class="pre">Cmd+Z</span></code> on Mac)</p></li>
+</ul>
+</section>
+<section id="wand-tool-wand-tool-shortcut-w">
+<h3><a class="reference internal" href="../../_images/wand-tool.jpg"><img alt="Wand tool" src="../../_images/wand-tool.jpg" style="width: 30px;" /></a>  Wand tool (shortcut: <code class="docutils literal notranslate"><span class="pre">W</span></code>)<a class="headerlink" href="#wand-tool-wand-tool-shortcut-w" title="Permalink to this headline">¶</a></h3>
+<p>The Wand tool is like a more enthusiastic brush tool. Not content with painting only a small circular region, it will spread out into a much larger circle - but only for so long as the pixels have intensities similar to the one that was clicked on.</p>
+<p>This provides a very powerful way to annotate regions quickly and with a high level of accuracy… provided they are substantially darker or lighter than the surroundings. It can also work well in selecting dense areas of cells surrounding by more space. But if the contrast is lower, the wand can appear to go out of control… and it’s best to revert back to the ‘standard’ Brush tool.</p>
+<p>With the <em>Wand tool</em>, you can use all the shortcuts and tips explained above for the <em>Brush tool</em>.</p>
+</section>
+<section id="summary-of-useful-shortcuts">
+<h3>Summary of useful shortcuts<a class="headerlink" href="#summary-of-useful-shortcuts" title="Permalink to this headline">¶</a></h3>
+<p>This is a list of the most useful shortcuts that you will probably need while annotating:</p>
+<ul class="simple">
+<li><p>Press <code class="docutils literal notranslate"><span class="pre">B</span></code> to select the brush tool, press <code class="docutils literal notranslate"><span class="pre">W</span></code> to select the wand tool, press <code class="docutils literal notranslate"><span class="pre">M</span></code> for the move tool.</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">SpaceBar</span></code> to temporarily select the move tool and move around in the image or zoom in.</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Alt</span></code> while brushing to erase areas from the selected annotation object</p></li>
+<li><p>Press <code class="docutils literal notranslate"><span class="pre">Ctrl+Z</span></code> to undo the last change</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift</span></code> and touch the screen (or click with the digital pen) inside a segment to remove overlapping areas</p></li>
+<li><p>Hold <code class="docutils literal notranslate"><span class="pre">Shift</span></code> and click with the mouse inside a segment to quickly select a cell class (in the case you have multiple classes of cells that you want to distinguish)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a complete overview of QuPath annotation tools, check out the <a class="reference external" href="https://qupath.readthedocs.io/en/stable/docs/starting/annotating.html#brush-brush-tool">QuPath documentation</a>.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="napari_labeling.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Annotating in Napari</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../cellpose_training/training.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Train Cellpose Models</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, Alberto Bailoni &lt;alberto.bailoni@embl.de&gt;.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
