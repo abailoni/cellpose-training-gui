@@ -17,7 +17,7 @@ Load one or more images (with one or multiple channels) and select the areas tha
 ![](docs/cellpose-training-gui/images/selecting_rois.jpg)
 
 ### Create annotations in QuPath or Napari
-Get a QuPath project that you can directly use to annotate the regions you selected, or annotate them directly using Napari.
+Get a QuPath project that you can directly use to annotate the regions you selected, or annotate them directly using Napari. Otherwise, you can also export the regions you selected in the format expected by the cellpose software and label them in cellpose 
 
 ![](docs/cellpose-training-gui/images/qupath/qupath-starting-interface.jpg)
 
