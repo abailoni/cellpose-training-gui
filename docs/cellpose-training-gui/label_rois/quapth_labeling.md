@@ -25,9 +25,12 @@ substitutions:
 :::
 
 # Annotating in QuPath
-::::{warning}
-Support for QuPath is still experimental and under development
-::::
+
+[comment]: <> (::::{warning})
+
+[comment]: <> (Support for QuPath is still experimental and under development)
+
+[comment]: <> (::::)
 
 ## Getting started
 

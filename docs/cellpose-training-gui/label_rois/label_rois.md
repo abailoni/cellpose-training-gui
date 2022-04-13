@@ -8,7 +8,6 @@ napari_labeling
 quapth_labeling
 ```
 
-Please note that the support for QuPath is still experimental and under development.
 
 
 

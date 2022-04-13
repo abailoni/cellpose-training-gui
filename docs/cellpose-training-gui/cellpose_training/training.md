@@ -1,7 +1,9 @@
-# Train cellpose
-At the moment it is not possible to directly train a new cellpose model from the graphical interface.
+# Train Cellpose Models
+More details coming soon...
 
-For the moment, you can either send your annotations to me (Alberto) or, if you are familiar with the cellpose training script, you can run it yourself.
+[comment]: <> (At the moment it is not possible to directly train a new cellpose model from the graphical interface.)
+
+[comment]: <> (For the moment, you can either send your annotations to me &#40;Alberto&#41; or, if you are familiar with the cellpose training script, you can run it yourself.)
 
 ## Manually training a new cellpose model
 
