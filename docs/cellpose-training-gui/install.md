@@ -27,7 +27,7 @@ Training a custom cellpose model requires a pytorch installation with CUDA suppo
 
 However, a basic version of the `traincellpose` tool is available for all OSs (Linux, Mac, Windows) and does not require a local GPU. In that case, you have the option to install the `traincellpose-server` tool on a remote server with CUDA support and conveniently train your model remotely.
 
-### Basic installation (no local cellpose models training)
+### Basic installation (no local training of Cellpose models)
 This basic installation is available for all OSs (Linux, Mac, Windows). To install it, you will need [miniconda](https://docs.conda.io/en/latest/miniconda.html) or [anaconda](https://docs.anaconda.com/anaconda/install/index.html).
 
 To install it, simply run the following conda command:
