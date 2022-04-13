@@ -3,34 +3,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-#  Core dependencies:
-  - python>=3.8.5 # Version required by cellpose
+  - python<=3.9
   - scipy
   - h5py
   - imageio
   - opencv
+  - pyyaml
   - tifffile
   - ome-zarr
-  - abailoni::speedrun
-# GUI dependencies:
   - napari
   - magicgui
   - pyqt
-  - sdvillal::qupath
+  - abailoni::speedrun
   - abailoni::paquo
-# Cellpose dependencies:
-  - pytorch::pytorch>=1.6
-  - numba
-  - mkl < 2022
-  - scikit-learn
-  - scikit-image
-  - pip
-  - pip:
-    - opencv-python-headless
-    - natsort
-    - tqdm
-    - fastremap
-    - edt
-    - torch_optimizer
-    - ncolor
-    - cellpose
