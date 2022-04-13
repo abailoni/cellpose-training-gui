@@ -23,19 +23,16 @@ requirements:
     - tifffile
     - ome-zarr
     - napari
-    - magicgui # Probably already included in napari
+    - magicgui
     - pyqt
-    - paquo #  QuPath dependency
-    # For cellpose
-#    - numba
-
+    - paquo
 
 test:
   imports:
     - traincellpose
     - traincellpose.core
     - traincellpose.napari_gui.roi_selection
-    - paquo #  QuPath dependency
+#    - paquo #  QuPath dependency
   source_files:
     - tests/**/*.py
   commands:
