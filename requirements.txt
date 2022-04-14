@@ -1,0 +1,12 @@
+scipy
+h5py
+imageio
+opencv-python-headless
+pyyaml
+tifffile
+ome-zarr
+napari[all]
+pyqt5
+pyqt5.sip
+git+https://github.com/abailoni/speedrun@master#egg=speedrun
+git+https://github.com/abailoni/paquo@main#egg=paquo
