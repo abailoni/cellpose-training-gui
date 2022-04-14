@@ -32,4 +32,8 @@ def open_path(path):
     elif platform.system() == "Darwin":
         subprocess.Popen(["open", path])
     else:
-        subprocess.Popen(["xdg-open", path])
+        try:
+            subprocess.Popen(["xdg-open", path])
+        except FileNotFoundError:
+            # Try with XFCE file manager:
+            subprocess.Popen(["thunar", path])

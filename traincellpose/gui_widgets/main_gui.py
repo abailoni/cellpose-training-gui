@@ -204,8 +204,25 @@ class StartingGUI(Container):
             # Choose model:
             self.pretrained_model = widgets.ComboBox(
                 label="Pretrained model",
-                tooltip="Choose the pretrained model from which to start training",
-                choices=["None", "cyto2", "Custom model"],
+                tooltip="Choose the pretrained model from which to start training (see cellpose docs for details)",
+                choices=["None",
+                         "cyto2",
+                         "Custom model",
+                         "livecell",
+                         "tissuenet",
+                         "cyto",
+                         "nuclei",
+                         "CP",
+                         "CPx",
+                         "TN1",
+                         "TN2",
+                         "TN3",
+                         "LC1",
+                         "LC2",
+                         "LC3",
+                         "LC4",
+                         "LC4",
+                         ],
                 value=training_params["pretrained_model_GUI"]
             )
 
