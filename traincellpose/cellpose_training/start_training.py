@@ -25,7 +25,7 @@ def start_cellpose_training(train_folder,
     # TODO: move fast_mode to config?
     python_interpreter = sys.executable
     CUDA_VISIBLE_DEVICES = os.environ["CUDA_VISIBLE_DEVICES"] if "CUDA_VISIBLE_DEVICES" in os.environ else "0"
-    command = '"{}" {} -m cellpose {} --train' \
+    command = '{} "{}" -m cellpose {} --train' \
               ' --use_gpu --fast_mode --dir "{}" {} '.format(
         "CUDA_VISIBLE_DEVICES=" + CUDA_VISIBLE_DEVICES,
         python_interpreter,
