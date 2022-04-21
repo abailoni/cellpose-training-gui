@@ -1,8 +1,11 @@
 # {{proj_name}}
 
-[comment]: <> (Tool to manually annotate single-cell microscopy images and train a custom Cellpose model.  )
+Graphical tool for quickly creating image segmentation annotations and training custom [Cellpose](https://www.cellpose.org) models.
 
-{{proj_name}} lets you load your single-cell microscopy images in Napari, select the regions of interests that you plan to annotate, and then annotate cells by using either Napari or QuPath.  
+Main features:
+1. Select regions of interests using Napari (from one or multiple images)
+2. Create cell annotations using QuPath or Napari 
+3. Train a new Cellpose model (with the option to train your model via the browser using a remote server with GPU and CUDA support) or export the training data and train a new model using the `cellpose>=2.0` interface.
 
 
 ```{toctree}

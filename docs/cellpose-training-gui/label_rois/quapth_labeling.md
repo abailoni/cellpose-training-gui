@@ -26,12 +26,6 @@ substitutions:
 
 # Annotating in QuPath
 
-[comment]: <> (::::{warning})
-
-[comment]: <> (Support for QuPath is still experimental and under development)
-
-[comment]: <> (::::)
-
 ## Getting started
 
 :::{image} ../images/qupath/qupath-starting-interface.jpg
@@ -41,9 +35,20 @@ substitutions:
 :::
 
 ### Starting QuPath
-1. Once you have selected the regions of interest with the SpaceM Annotator tool, you should close the tool and launch QuPath from the installed applications.
-2. In the SpaceM Annotator project folder, you can find a folder named `QuPathProject`. To load the regions of interest in QuPath, you should drag this folder into QuPath. Alternatively, you can click on the Menu item _File/Projects.../Open Project_ and open the `project.qpproj` file in the `QuPathProject` folder.
-3. After loading the project, you should see the list of regions of interest on the left. You can double-click on one image to open it in the viewer.
+:::{image} ../images/starting-QuPath.jpg
+:alt: Starting QuPath 
+:width: 40%
+:align: right
+:::
+**Option 1**: Start QuPath directly from the `traincellpose` tool:
+- Once you have selected the regions of interest using Napari (see [](../select_rois)), simply choose `QuPath` as annotation tool in the starting window of the `traincellpose` starting window and then click on `Annotate ROIs` 
+- After QuPath starts, on the left panel you should see the regions of interest you selected: double-click on one image to open it in the viewer
+
+**Option 2**: Lauch QuPath manually and then load the QuPath  annotation project:
+- In the `traincellpose` project folder, you find a folder named `QuPathProject`. To open this folder (and compress it to a `zip` file) you can click on the `Export QuPath Project` button. 
+- To load the regions of interest in QuPath, you simply have to drag this folder into QuPath. Alternatively, after starting QuPath you can click on the Menu item `File/Projects.../Open Project` and open the `project.qpproj` file in the `QuPathProject` folder.
+- On the left panel you should see the regions of interest you selected: double-click on one image to open it in the viewer
+
 
 
 <br/><br/>

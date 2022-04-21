@@ -4,7 +4,7 @@ Graphical tool for quickly creating image segmentation annotations and training 
 Main features:
 1. Select regions of interests using Napari (from one or multiple images)
 2. Create cell annotations using QuPath or Napari 
-3. Train a new Cellpose model (with option to use a remote server with GPU and CUDA support) or export the training data and train a new model using the `cellpose>=2.0` interface.
+3. Train a new Cellpose model (with the option to train your model via the browser using a remote server with GPU and CUDA support) or export the training data and train a new model using the `cellpose>=2.0` interface.
 
 To install it, see the [documentation](https://abailoni.github.io/cellpose-training-gui). 
 
@@ -27,4 +27,6 @@ Train a new model directly from the tool, or export the training data and train 
 ![](docs/cellpose-training-gui/images/new_training_GUI.jpg)
 
 #### Train custom model on a remote server
-If your machine does not have a GPU and CUDA support, you can install the `traincellpose-server-daemon` on a remote server with a GPU and train your models remotely via the browser. 
+If your machine does not have a GPU and CUDA support, you can install the `TrainCellposeServer` tool on a remote server with a GPU and train your models remotely via the browser (see [Cellpose training server tool](https://github.com/abailoni/cellpose-training-server)). 
+
+![](docs/cellpose-training-gui/images/training-remotely.gif)

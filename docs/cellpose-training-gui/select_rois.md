@@ -41,6 +41,11 @@ For each image, you can add up to four channels:
 
 After you select the files with the image channels, click on _Update Displayed Image Channels_. This will add the image to the project and the image channels will be loaded in napari in different colors.
 
+::::{tip}
+If you copy the images that you want to add to the project into the `traincellpose` project directory itself (for example in the `input_images` subdirectory), then only relative paths will be stored and the input images will be found even if you later decide to move your annotation project directory to another location or another machine.
+::::
+
+
 ### Browsing images in the project and adding new ones
 After adding the first image, you can add another image by selecting the _"Add new image"_ option from the dropdown menu _"Shown image"_ in the top-right corner. Alternatively, using the same menu, you can switch between the images in the project.
 
@@ -72,7 +77,7 @@ After selecting the shape layer, you can perform the following three actions:
 
 
 ::::{tip}
-While you have the "rectangle" or "select" tools selected, if you want to **zoom or move around in the image**, you can do that by keeping the \<space-bar> key pressed.
+While you have the "rectangle" or "select" tools selected, you can **zoom or move around in the image**  by keeping the `SpaceBar` key pressed.
 ::::
 
 ::::{note}
