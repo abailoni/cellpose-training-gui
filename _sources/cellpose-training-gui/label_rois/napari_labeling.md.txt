@@ -1,13 +1,11 @@
-:::{image} ../images/starting-gui-label.jpg
-:alt: Button to start labeling in Napari 
-:width: 45%
+:::{image} ../images/starting-Napari.jpg
+:alt: Starting Napari annotation tool 
+:width: 50%
 :align: right
 :::
 
 # Annotating in Napari
-
-
-You can start labeling in Napari by clicking on the `Label Regions of Interest` button in the main window of the annotation tool. A new napari viewer will then open, displaying one region of interest at the time.
+Once you have selected the regions of interest using Napari (see [](../select_rois)), simply choose `Napari` as annotation tool in the starting window of the `traincellpose` starting window and then click on `Annotate ROIs`. A new napari viewer will then open, displaying one region of interest at the time.
 
 **Selecting a region of interest**:
 To start annotating, you first select a region of interest by using the drop-down menu in the top-right corner (see image below). Initially, the first region will be displayed.

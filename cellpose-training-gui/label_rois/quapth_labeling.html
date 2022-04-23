@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Annotating in QuPath &#8212; Cellpose-training-GUI  documentation</title>
+    <title>Annotating in QuPath &#8212; Cellpose Training GUI  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -34,8 +34,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Train Cellpose Models" href="../cellpose_training/training.html" />
-    <link rel="prev" title="Annotating in Napari" href="napari_labeling.html" />
+    <link rel="next" title="Annotating in Napari" href="napari_labeling.html" />
+    <link rel="prev" title="Annotate Regions of Interest" href="label_rois.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -54,7 +54,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Cellpose-training-GUI</p>
+<p class="title">Cellpose Training GUI</p>
 </a>
 
     
@@ -125,14 +125,14 @@
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
     <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="napari_labeling.html">
-   Annotating in Napari
-  </a>
- </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Annotating in QuPath
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="napari_labeling.html">
+   Annotating in Napari
   </a>
  </li>
 </ul>
@@ -254,11 +254,18 @@
 <a class="reference internal image-reference" href="../../_images/qupath-starting-interface.jpg"><img alt="QuPath starting interface" class="align-center" src="../../_images/qupath-starting-interface.jpg" style="width: 100%;" /></a>
 <section id="starting-qupath">
 <h3>Starting QuPath<a class="headerlink" href="#starting-qupath" title="Permalink to this headline">¶</a></h3>
-<ol class="arabic simple">
-<li><p>Once you have selected the regions of interest with the SpaceM Annotator tool, you should close the tool and launch QuPath from the installed applications.</p></li>
-<li><p>In the SpaceM Annotator project folder, you can find a folder named <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code>. To load the regions of interest in QuPath, you should drag this folder into QuPath. Alternatively, you can click on the Menu item <em>File/Projects…/Open Project</em> and open the <code class="docutils literal notranslate"><span class="pre">project.qpproj</span></code> file in the <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code> folder.</p></li>
-<li><p>After loading the project, you should see the list of regions of interest on the left. You can double-click on one image to open it in the viewer.</p></li>
-</ol>
+<a class="reference internal image-reference" href="../../_images/starting-QuPath.jpg"><img alt="Starting QuPath" class="align-right" src="../../_images/starting-QuPath.jpg" style="width: 40%;" /></a>
+<p><strong>Option 1</strong>: Start QuPath directly from the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> tool:</p>
+<ul class="simple">
+<li><p>Once you have selected the regions of interest using Napari (see <a class="reference internal" href="../select_rois.html"><span class="doc std std-doc">Select Regions of Interest</span></a>), simply choose <code class="docutils literal notranslate"><span class="pre">QuPath</span></code> as annotation tool in the starting window of the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> starting window and then click on <code class="docutils literal notranslate"><span class="pre">Annotate</span> <span class="pre">ROIs</span></code></p></li>
+<li><p>After QuPath starts, on the left panel you should see the regions of interest you selected: double-click on one image to open it in the viewer</p></li>
+</ul>
+<p><strong>Option 2</strong>: Lauch QuPath manually and then load the QuPath  annotation project:</p>
+<ul class="simple">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> project folder, you find a folder named <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code>. To open this folder (and compress it to a <code class="docutils literal notranslate"><span class="pre">zip</span></code> file) you can click on the <code class="docutils literal notranslate"><span class="pre">Export</span> <span class="pre">QuPath</span> <span class="pre">Project</span></code> button.</p></li>
+<li><p>To load the regions of interest in QuPath, you simply have to drag this folder into QuPath. Alternatively, after starting QuPath you can click on the Menu item <code class="docutils literal notranslate"><span class="pre">File/Projects.../Open</span> <span class="pre">Project</span></code> and open the <code class="docutils literal notranslate"><span class="pre">project.qpproj</span></code> file in the <code class="docutils literal notranslate"><span class="pre">QuPathProject</span></code> folder.</p></li>
+<li><p>On the left panel you should see the regions of interest you selected: double-click on one image to open it in the viewer</p></li>
+</ul>
 <p><br/><br/></p>
 <a class="reference internal image-reference" href="../../_images/channel-contrast.jpg"><img alt="Adjust channels contrast" class="align-right" src="../../_images/channel-contrast.jpg" style="width: 35%;" /></a>
 </section>
@@ -338,17 +345,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="napari_labeling.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="label_rois.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Annotating in Napari</p>
+            <p class="prev-next-title">Annotate Regions of Interest</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../cellpose_training/training.html" title="next page">
+    <a class='right-next' id="next-link" href="napari_labeling.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Train Cellpose Models</p>
+        <p class="prev-next-title">Annotating in Napari</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

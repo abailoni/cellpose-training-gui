@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Cellpose-training-GUI &#8212; Cellpose-training-GUI  documentation</title>
+    <title>Cellpose Training GUI &#8212; Cellpose Training GUI  documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -53,7 +53,7 @@
     
     
 <a class="navbar-brand" href="#">
-<p class="title">Cellpose-training-GUI</p>
+<p class="title">Cellpose Training GUI</p>
 </a>
 
     
@@ -162,15 +162,21 @@
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="cellpose-training-gui">
-<h1>Cellpose-training-GUI<a class="headerlink" href="#cellpose-training-gui" title="Permalink to this headline">¶</a></h1>
-<p>Cellpose-training-GUI lets you load your single-cell microscopy images in Napari, select the regions of interests that you plan to annotate, and then annotate cells by using either Napari or QuPath.</p>
+<h1>Cellpose Training GUI<a class="headerlink" href="#cellpose-training-gui" title="Permalink to this headline">¶</a></h1>
+<p>Graphical tool for quickly creating image segmentation annotations and training custom <a class="reference external" href="https://www.cellpose.org">Cellpose</a> models.</p>
+<p>Main features:</p>
+<ol class="arabic simple">
+<li><p>Select regions of interests using Napari (from one or multiple images)</p></li>
+<li><p>Create cell annotations using QuPath or Napari</p></li>
+<li><p>Train a new Cellpose model (with the option to train your model via the browser using a remote server with GPU and CUDA support) or export the training data and train a new model using the <code class="docutils literal notranslate"><span class="pre">cellpose&gt;=2.0</span></code> interface.</p></li>
+</ol>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation:
 </span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cellpose-training-gui/install.html">Getting started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/install.html#how-to-install">How to install</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/install.html#how-to-run">How to run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/install.html#how-to-start-the-tool">How to start the tool</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cellpose-training-gui/select_rois.html">Select Regions of Interest</a><ul>
@@ -180,12 +186,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cellpose-training-gui/label_rois/label_rois.html">Annotate Regions of Interest</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/label_rois/napari_labeling.html">Annotating in Napari</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/label_rois/quapth_labeling.html">Annotating in QuPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/label_rois/label_rois.html#using-qupath-or-napari">Using QuPath or Napari</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/label_rois/label_rois.html#using-external-software-e-g-cellpose">Using external software (e.g. Cellpose)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cellpose-training-gui/cellpose_training/training.html">Train Cellpose Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/cellpose_training/training.html#manually-training-a-new-cellpose-model">Manually training a new cellpose model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/cellpose_training/training.html#training-configuration">Training configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cellpose-training-gui/cellpose_training/training.html#starting-the-training">Starting the Training</a></li>
 </ul>
 </li>
 </ul>

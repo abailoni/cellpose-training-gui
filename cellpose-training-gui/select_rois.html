@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Select Regions of Interest &#8212; Cellpose-training-GUI  documentation</title>
+    <title>Select Regions of Interest &#8212; Cellpose Training GUI  documentation</title>
     
     <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -54,7 +54,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Cellpose-training-GUI</p>
+<p class="title">Cellpose Training GUI</p>
 </a>
 
     
@@ -246,6 +246,10 @@
 <li><p><strong>Extra channels</strong>: If you have additional channels that may be helpful for the manual annotation process, you can load them. They won’t be used by the segmentation algorithm though.</p></li>
 </ul>
 <p>After you select the files with the image channels, click on <em>Update Displayed Image Channels</em>. This will add the image to the project and the image channels will be loaded in napari in different colors.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you copy the images that you want to add to the project into the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> project directory itself (for example in the <code class="docutils literal notranslate"><span class="pre">input_images</span></code> subdirectory), then only relative paths will be stored and the input images will be found even if you later decide to move your annotation project directory to another location or another machine.</p>
+</div>
 </section>
 <section id="browsing-images-in-the-project-and-adding-new-ones">
 <h3>Browsing images in the project and adding new ones<a class="headerlink" href="#browsing-images-in-the-project-and-adding-new-ones" title="Permalink to this headline">¶</a></h3>
@@ -269,7 +273,7 @@
 </ol>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>While you have the “rectangle” or “select” tools selected, if you want to <strong>zoom or move around in the image</strong>, you can do that by keeping the &lt;space-bar&gt; key pressed.</p>
+<p>While you have the “rectangle” or “select” tools selected, you can <strong>zoom or move around in the image</strong>  by keeping the <code class="docutils literal notranslate"><span class="pre">SpaceBar</span></code> key pressed.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

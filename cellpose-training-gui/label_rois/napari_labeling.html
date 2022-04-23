@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Annotating in Napari &#8212; Cellpose-training-GUI  documentation</title>
+    <title>Annotating in Napari &#8212; Cellpose Training GUI  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -34,8 +34,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Annotating in QuPath" href="quapth_labeling.html" />
-    <link rel="prev" title="Annotate Regions of Interest" href="label_rois.html" />
+    <link rel="next" title="Train Cellpose Models" href="../cellpose_training/training.html" />
+    <link rel="prev" title="Annotating in QuPath" href="quapth_labeling.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -54,7 +54,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Cellpose-training-GUI</p>
+<p class="title">Cellpose Training GUI</p>
 </a>
 
     
@@ -125,14 +125,14 @@
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
     <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Annotating in Napari
-  </a>
- </li>
  <li class="toctree-l1">
   <a class="reference internal" href="quapth_labeling.html">
    Annotating in QuPath
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Annotating in Napari
   </a>
  </li>
 </ul>
@@ -191,10 +191,10 @@
               
               <div>
                 
-  <a class="reference internal image-reference" href="../../_images/starting-gui-label.jpg"><img alt="Button to start labeling in Napari" class="align-right" src="../../_images/starting-gui-label.jpg" style="width: 45%;" /></a>
+  <a class="reference internal image-reference" href="../../_images/starting-Napari.jpg"><img alt="Starting Napari annotation tool" class="align-right" src="../../_images/starting-Napari.jpg" style="width: 50%;" /></a>
 <section class="tex2jax_ignore mathjax_ignore" id="annotating-in-napari">
 <h1>Annotating in Napari<a class="headerlink" href="#annotating-in-napari" title="Permalink to this headline">¶</a></h1>
-<p>You can start labeling in Napari by clicking on the <code class="docutils literal notranslate"><span class="pre">Label</span> <span class="pre">Regions</span> <span class="pre">of</span> <span class="pre">Interest</span></code> button in the main window of the annotation tool. A new napari viewer will then open, displaying one region of interest at the time.</p>
+<p>Once you have selected the regions of interest using Napari (see <a class="reference internal" href="../select_rois.html"><span class="doc std std-doc">Select Regions of Interest</span></a>), simply choose <code class="docutils literal notranslate"><span class="pre">Napari</span></code> as annotation tool in the starting window of the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> starting window and then click on <code class="docutils literal notranslate"><span class="pre">Annotate</span> <span class="pre">ROIs</span></code>. A new napari viewer will then open, displaying one region of interest at the time.</p>
 <p><strong>Selecting a region of interest</strong>:
 To start annotating, you first select a region of interest by using the drop-down menu in the top-right corner (see image below). Initially, the first region will be displayed.</p>
 <a class="reference internal image-reference" href="../../_images/adjust-contrast.jpg"><img alt="Adjust layer contrast" class="align-center" src="../../_images/adjust-contrast.jpg" style="width: 100%;" /></a>
@@ -238,17 +238,17 @@ However, in the following you will find a recap of the most important functions 
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="label_rois.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="quapth_labeling.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Annotate Regions of Interest</p>
+            <p class="prev-next-title">Annotating in QuPath</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="quapth_labeling.html" title="next page">
+    <a class='right-next' id="next-link" href="../cellpose_training/training.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Annotating in QuPath</p>
+        <p class="prev-next-title">Train Cellpose Models</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

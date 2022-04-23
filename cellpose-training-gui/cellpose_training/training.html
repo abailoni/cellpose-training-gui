@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Train Cellpose Models &#8212; Cellpose-training-GUI  documentation</title>
+    <title>Train Cellpose Models &#8212; Cellpose Training GUI  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -34,7 +34,7 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="Annotating in QuPath" href="../label_rois/quapth_labeling.html" />
+    <link rel="prev" title="Annotating in Napari" href="../label_rois/napari_labeling.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -53,7 +53,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Cellpose-training-GUI</p>
+<p class="title">Cellpose Training GUI</p>
 </a>
 
     
@@ -146,18 +146,32 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#manually-training-a-new-cellpose-model">
-   Manually training a new cellpose model
+  <a class="reference internal nav-link" href="#training-configuration">
+   Training configuration
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#input-data">
-     Input data
+    <a class="reference internal nav-link" href="#generating-training-data">
+     Generating Training Data
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#format-of-training-data">
+       Format of Training Data
+      </a>
+     </li>
+    </ul>
    </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#starting-the-training">
+   Starting the Training
+  </a>
+  <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#tips-for-training">
-     Tips for training
+    <a class="reference internal nav-link" href="#getting-the-trained-model">
+     Getting the trained model
     </a>
    </li>
   </ul>
@@ -185,21 +199,69 @@
                 
   <section class="tex2jax_ignore mathjax_ignore" id="train-cellpose-models">
 <h1>Train Cellpose Models<a class="headerlink" href="#train-cellpose-models" title="Permalink to this headline">¶</a></h1>
-<p>More details coming soon…</p>
-<section id="manually-training-a-new-cellpose-model">
-<h2>Manually training a new cellpose model<a class="headerlink" href="#manually-training-a-new-cellpose-model" title="Permalink to this headline">¶</a></h2>
-<section id="input-data">
-<h3>Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
+<p>After having manually annotated all the regions of interest that you selected (make sure that <strong>ALL cells</strong> have been annotated), then you can proceed with the training of a custom cellpose model by clicking on the <code class="docutils literal notranslate"><span class="pre">Configure</span> <span class="pre">Training</span> <span class="pre">of</span> <span class="pre">Custom</span> <span class="pre">Cellpose</span> <span class="pre">Model</span></code> button on the main window of the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> tool.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In  <code class="docutils literal notranslate"><span class="pre">cellpose&gt;=2.0</span></code> you can also train a model directly from the graphical interface. The tools provided here achieve similar results, but they also allows you to <strong>set custom cellpose training parameters via config file</strong> (even those that are not exposed to the graphical interface), and conveniently <strong>train a model via the browser using a remote machine with GPU</strong> and CUDA support (see <a class="reference external" href="https://github.com/abailoni/cellpose-training-server">Cellpose training server tool</a> for more details).</p>
+</div>
+<a class="reference internal image-reference" href="../../_images/starting-training.jpg"><img alt="Starting training" class="align-center" src="../../_images/starting-training.jpg" style="width: 75%;" /></a>
+<section id="training-configuration">
+<h2>Training configuration<a class="headerlink" href="#training-configuration" title="Permalink to this headline">¶</a></h2>
+<p>In the ideal case, you won’t need to change any training parameter and just leave the default values. For more details about the training parameters, see the <a class="reference external" href="https://cellpose.readthedocs.io/en/latest/train.html">Cellpose documentation</a>.</p>
+<a class="reference internal image-reference" href="../../_images/training-config.jpg"><img alt="Training configuration" class="align-center" src="../../_images/training-config.jpg" style="width: 70%;" /></a>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Depending on how your images look like, you may want to tick the <code class="docutils literal notranslate"><span class="pre">Preprocess</span> <span class="pre">images</span> <span class="pre">before</span> <span class="pre">training</span></code> option to auto-adjust image saturation of the images. You can also call some custom preprocessing functions by defining them in the <code class="docutils literal notranslate"><span class="pre">PROJ_DIR/Configurations/main_config.yml</span></code> config file, in its <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code> section.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If there is an extra training parameter that cannot be set using the graphical interface, you can conveniently set it via config file. See next section for more details.</p>
+</div>
+<section id="generating-training-data">
+<h3>Generating Training Data<a class="headerlink" href="#generating-training-data" title="Permalink to this headline">¶</a></h3>
+<p>Once you have chosen the training parameters, you can click on the <code class="docutils literal notranslate"><span class="pre">Prepare</span> <span class="pre">and</span> <span class="pre">Export</span> <span class="pre">Cellpose</span> <span class="pre">Training</span> <span class="pre">Data</span></code> button. This will open a file manager window with the training data folder (found in <code class="docutils literal notranslate"><span class="pre">PROJ_DIR/CellposeTraining/my_model_name</span></code>) and a compressed version of it, in case you plan to move the data to another machine with GPU where training will be performed.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can also generate training data directly via command line. Simply run the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>traincellpose setup_training --model_name my_model
+</pre></div>
+</div>
+<p>This will generate a new training data folder using the default GUI training parameters (or the last ones you set via the GUI). You can update them later by modifying the generated config file.</p>
+</div>
+<section id="format-of-training-data">
+<h4>Format of Training Data<a class="headerlink" href="#format-of-training-data" title="Permalink to this headline">¶</a></h4>
+<p>The folder with the training data contains the following files:</p>
 <ul class="simple">
-<li><p>You can find all the necessary images to start the training in the <code class="docutils literal notranslate"><span class="pre">project_dir/Cellpose</span></code> folder. Input images and training labels are already in the format expected by the cellpose script.</p></li>
-<li><p>In the input training images, the green channel represents the main segmentation channel and the red channel is the DAPI channel (if present, otherwise it will be black).</p></li>
+<li><p>A config file <code class="docutils literal notranslate"><span class="pre">train_config.yml</span></code> with cellpose parameters that will be used for training (and can be easily updated with any extra <code class="docutils literal notranslate"><span class="pre">args</span></code> and <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> that will be passed to the command line cellpose training command)</p></li>
+<li><p>Training images placed in the <code class="docutils literal notranslate"><span class="pre">training_images</span></code> subdirectory: if needed you can add external training images.</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keep in mind that the cellpose input images generated by the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> tool are such that the green channel represents the main segmentation channel and the red channel is the DAPI channel (otherwise set to zero if DAPI is not present)</p>
+</div>
 </section>
-<section id="tips-for-training">
-<h3>Tips for training<a class="headerlink" href="#tips-for-training" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="starting-the-training">
+<h2>Starting the Training<a class="headerlink" href="#starting-the-training" title="Permalink to this headline">¶</a></h2>
+<p>Once you are done setting the training parameters and the training data has been generated, you have few options to start the training:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="training_cli.html"><span class="doc std std-doc">Custom cellpose training parameters and CLI commands</span></a></p></li>
+<li><p>If your machine has a GPU with CUDA support and you installed <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> with GPU support (see instructions <a class="reference internal" href="../install.html#install-with-cuda"><span class="std std-ref">here</span></a>), then you can simply <strong>start the training locally</strong> by clicking on the <code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">Training</span></code> button. In principle you could also start training with the CPU version of PyTorch, but then training will take a much longer time</p></li>
+<li><p>If your machine does not have a GPU, then you can also install the <strong>TrainCellposeServer</strong> tool on a server with GPU support and then training your model by simply drag and dropping the zipped training data via a browser. For more details and instructions, see <a class="reference external" href="https://github.com/abailoni/cellpose-training-server">Cellpose training server tool</a></p></li>
+<li><p>Alternatively, you can load the generated training images in the <code class="docutils literal notranslate"><span class="pre">cellpose&gt;=2.0</span></code> interface and train your model there (also in this case you will need a local GPU on your machine)</p></li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In case you do not have access to a graphical interface, you can also start the training via command line:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>traincellpose train --model_name my_model
+</pre></div>
+</div>
+</div>
+<p>Web interface for training your model remotely:</p>
+<a class="reference internal image-reference" href="../../_images/training-remotely.gif"><img alt="Training remotely" class="align-center" src="../../_images/training-remotely.gif" style="width: 70%;" /></a>
+<section id="getting-the-trained-model">
+<h3>Getting the trained model<a class="headerlink" href="#getting-the-trained-model" title="Permalink to this headline">¶</a></h3>
+<p>At the end of the training process, the trained model file will be saved inside the training data directory. Currently, there is no way to test a cellpose model using the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> tool, but you can do that via the cellpose interface by predicting a segmentation using the custom model you trained.</p>
 </section>
 </section>
 </section>
@@ -210,11 +272,11 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../label_rois/quapth_labeling.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../label_rois/napari_labeling.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Annotating in QuPath</p>
+            <p class="prev-next-title">Annotating in Napari</p>
         </div>
     </a>
 </div>
