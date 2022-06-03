@@ -50,6 +50,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             self.set("labeling_tool", "QuPath")
             self.set_default_training_args()
             self.set_default_preprocessing_config()
+            self.apply_preprocessing = False
 
         # Initialize or load dataframes:
         self._rois_df = None
@@ -660,11 +661,11 @@ class BaseAnnotationExperiment(BaseExperiment):
         training_config["cellpose_kwargs"] = cellpose_kwargs = {}
 
         cellpose_kwargs["pretrained_model"] = "cyto2"
-        cellpose_kwargs["save_every"] = 10
-        cellpose_kwargs["learning_rate"] = 0.0002
+        # cellpose_kwargs["save_every"] = 10
+        cellpose_kwargs["learning_rate"] = 0.2
         cellpose_kwargs["chan"] = 2
         cellpose_kwargs["chan2"] = 1
-        cellpose_kwargs["n_epochs"] = 2000
+        cellpose_kwargs["n_epochs"] = 500
         cellpose_kwargs["batch_size"] = 8
         cellpose_kwargs["mask_filter"] = "_masks"
 

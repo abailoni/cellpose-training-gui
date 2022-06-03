@@ -327,7 +327,7 @@ class StartingGUI(Container):
                 # widgets.Container(widgets=[self.use_dapi_for_training], label=""),
                 # widgets.Container(widgets=[self.use_dapi_for_training]),
                 self.use_dapi_for_training,
-                self.apply_preprocessing,
+                # self.apply_preprocessing,
                 widgets.Label(label=""),
                 setup_training_data_button,
                 start_training_button,
