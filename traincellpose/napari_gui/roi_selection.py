@@ -177,12 +177,20 @@ class RoiSelectionWidget(Container):
             assert isinstance(info_message, str)
             self.append(widgets.Label(value=info_message))
 
+
     def update_rois(self):
         assert self.image_id is not None
         # TODO: create method to get annotation layer
-        idx = self.main_gui.roi_select_viewer.layers.index("Regions of interest")
-        shapes = self.main_gui.roi_select_viewer.layers[idx].data
-        self.main_gui.project.update_rois_image(self.image_id, shapes)
+        # TODO: create class attribute
+        shape_layer_name = "Regions of interest"
+        loaded_layer_names = [lay.name for lay in self.main_gui.roi_select_viewer.layers]
+        print(loaded_layer_names)
+        if shape_layer_name in loaded_layer_names:
+            shape_layer = self.main_gui.roi_select_viewer.layers[shape_layer_name]
+            # idx = self.main_gui.roi_select_viewer.layers.index(shape_layer)
+            # shapes = self.main_gui.roi_select_viewer.layers[idx].data
+            shapes = shape_layer.data
+            self.main_gui.project.update_rois_image(self.image_id, shapes)
 
     def get_path_file(self, real_path):
         assert isinstance(real_path, pathlib.Path)
@@ -211,14 +219,17 @@ class RoiSelectionWidget(Container):
             else:
                 # Check if I should remove a layer:
                 if layer_name in loaded_layer_names:
-                    viewer.layers.remove(layer_name)
+                    layer = viewer.layers[layer_name]
+                    viewer.layers.remove(layer)
 
 
         # Now load the ROIs:
         shape_layer_name = "Regions of interest"
         shape_layer_is_visible = shape_layer_name in loaded_layer_names
+        print(loaded_layer_names)
         if shape_layer_is_visible:
-            layers.remove(shape_layer_name)
+            shape_layer = viewer.layers[shape_layer_name]
+            layers.remove(shape_layer)
         if self.image_id is not None:
             napari_rois = self.main_gui.project.get_napari_roi_by_image_id(self.image_id)
             viewer.add_shapes(data=napari_rois, name=shape_layer_name,
