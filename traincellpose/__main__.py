@@ -1,7 +1,7 @@
 import argparse
+import logging
 
 from traincellpose.core import BaseAnnotationExperiment
-
 
 def run_GUI(args):
     from magicgui.types import FileDialogMode
@@ -45,6 +45,10 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-d', '--proj_dir', required=False, default=None, type=str, help='Project directory to load')
+    parser.add_argument('-log',
+                        '--loglevel',
+                        default='warning',
+                        help='Provide logging level. Example --loglevel debug, default=warning')
     parser.set_defaults(func=run_GUI)
 
     subparsers = parser.add_subparsers(dest='subparser')
@@ -63,7 +67,16 @@ def main():
         '-m', '--model_name', required=True, dest='model_name', help='Name of the model to be trained')
 
     args = parser.parse_args()
+
+    logging.basicConfig(format='%(asctime)s.%(msecs)03d [%(name)s] [%(levelname)s] %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=args.loglevel.upper())
+    logging.basicConfig()
+    logger = logging.getLogger(__name__)
+    logger.setLevel(args.loglevel.upper())
+
     args.func(args)
+
 
 
 if __name__ == '__main__':

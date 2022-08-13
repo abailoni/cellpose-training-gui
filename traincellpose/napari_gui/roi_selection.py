@@ -2,6 +2,10 @@ import pathlib
 from pathlib import Path
 import os
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 from magicgui.types import FileDialogMode
 import magicgui.widgets as widgets
 from magicgui.widgets import (
@@ -28,6 +32,7 @@ class RoiSelectionWidget(Container):
         # ----------------------------
         # Create combo box to decide which image will be loaded:
         # ----------------------------
+        self.logger.debug(f"Setting up ROI gui with image ID '{self.image_id}'")
         nb_images_in_proj = self.main_gui.project.nb_input_images
 
         current_choice = "Add new image" if self.image_id is None else "Image {}".format(self.image_id+1)
@@ -42,6 +47,7 @@ class RoiSelectionWidget(Container):
 
         @self.selected_image.changed.connect
         def update_selected_image_id():
+            self.logger.debug("Updated image choice")
             # First update ROIs, if user forgot:
             if self.image_id is not None:
                 self.update_rois()
@@ -85,6 +91,7 @@ class RoiSelectionWidget(Container):
 
         @load_images_button.changed.connect
         def update_image_paths():
+            self.logger.debug("Updated image path button")
             # Retrieve and validate paths:
             main_ch = self.get_path_file(self.main_ch.value)
             dapi_ch = self.get_path_file(self.dapi_ch.value)
@@ -112,6 +119,7 @@ class RoiSelectionWidget(Container):
 
         @add_new_image_button.changed.connect
         def add_new_image():
+            self.logger.debug("Clicked on add new image")
             # First update ROIs, if user forgot:
             if self.image_id is not None:
                 self.update_rois()
@@ -150,6 +158,7 @@ class RoiSelectionWidget(Container):
 
         @update_rois_button.changed.connect
         def update_rois():
+            self.logger.debug("Clicked on update ROI button")
             self.update_rois()
 
         if self.image_id is not None:
@@ -163,6 +172,7 @@ class RoiSelectionWidget(Container):
         close_button = PushButton(name="close_and_go_back", text="Go Back to Starting Window")
         @close_button.changed.connect
         def close_viewer_and_go_back():
+            self.logger.debug("Close viewer")
             # First update ROIs, if user forgot:
             if self.image_id is not None:
                 self.update_rois()
@@ -177,15 +187,20 @@ class RoiSelectionWidget(Container):
             assert isinstance(info_message, str)
             self.append(widgets.Label(value=info_message))
 
+        self.logger.debug("Done creating napari gui")
+
 
     def update_rois(self):
         assert self.image_id is not None
         # TODO: create method to get annotation layer
         # TODO: create class attribute
-        shape_layer_name = "Regions of interest"
+        shape_layer_name = self.roi_layer_name
+
         loaded_layer_names = [lay.name for lay in self.main_gui.roi_select_viewer.layers]
-        print(loaded_layer_names)
+        self.logger.debug(f"Updating ROIs: {loaded_layer_names}")
         if shape_layer_name in loaded_layer_names:
+
+            self.logger.debug(f"Updating ROIs - getting data: {loaded_layer_names}")
             shape_layer = self.main_gui.roi_select_viewer.layers[shape_layer_name]
             # idx = self.main_gui.roi_select_viewer.layers.index(shape_layer)
             # shapes = self.main_gui.roi_select_viewer.layers[idx].data
@@ -224,15 +239,18 @@ class RoiSelectionWidget(Container):
 
 
         # Now load the ROIs:
-        shape_layer_name = "Regions of interest"
-        shape_layer_is_visible = shape_layer_name in loaded_layer_names
-        print(loaded_layer_names)
+        layers = viewer.layers
+        loaded_layer_names = [lay.name for lay in layers]
+        shape_layer_is_visible = self.roi_layer_name in loaded_layer_names
+        self.logger.debug(f"Loading layers: {loaded_layer_names}")
         if shape_layer_is_visible:
-            shape_layer = viewer.layers[shape_layer_name]
+            self.logger.debug(f"Removing ROI layer")
+            shape_layer = viewer.layers[self.roi_layer_name]
             layers.remove(shape_layer)
         if self.image_id is not None:
+            self.logger.debug(f"Creating ROI layer")
             napari_rois = self.main_gui.project.get_napari_roi_by_image_id(self.image_id)
-            viewer.add_shapes(data=napari_rois, name=shape_layer_name,
+            viewer.add_shapes(data=napari_rois, name=self.roi_layer_name,
                                                  shape_type="rectangle", opacity=0.15, edge_color='#fff01dff',
                                                  face_color='#f9ffbeff')
 
@@ -243,3 +261,11 @@ class RoiSelectionWidget(Container):
 
     def get_list_path_widgets(self):
         return [self.main_ch, self.dapi_ch, self.extra_ch_1, self.extra_ch_2]
+
+    @property
+    def roi_layer_name(self):
+        return "Regions of interest"
+
+    @property
+    def logger(self):
+        return logging.getLogger(__name__)

@@ -3,6 +3,7 @@ import os
 import shutil
 from copy import deepcopy
 from shutil import copyfile
+import logging
 
 import numpy as np
 import pandas
@@ -746,3 +747,7 @@ class BaseAnnotationExperiment(BaseExperiment):
             os.makedirs(os.path.join(value, 'QuPathProject/input_images'), exist_ok=True)
 
             self._experiment_directory = value
+
+    @property
+    def logger(self):
+        return logging.getLogger(__name__)
