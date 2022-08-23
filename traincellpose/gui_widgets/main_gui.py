@@ -1,4 +1,3 @@
-import os
 import subprocess
 import sys
 
@@ -10,27 +9,12 @@ from magicgui.widgets import (
     PushButton,
 )
 
-from ..io.various import open_path
+from ..napari_gui.gui_utils import show_message_pop_up
 from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
 from ..qupath.update_qupath_proj import update_paths_images_in_project
 
 
-def show_message_pop_up(info_message: str):
-    assert isinstance(info_message, str)
-    info_window = widgets.Container()
-    close_window_button = PushButton(name="close_window", text="Ok")
-    info_window.extend([
-        widgets.Label(label=info_message),
-        close_window_button
-    ])
-
-    info_window.show()
-
-    @close_window_button.changed.connect
-    def close_info_window():
-        info_window.clear()
-        info_window.hide()
 
 
 class StartingGUI(Container):

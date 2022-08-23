@@ -1,9 +1,11 @@
 import math
 import os
 import shutil
+import traceback
 from copy import deepcopy
 from shutil import copyfile
 import logging
+from typing import Dict, Union, List
 
 import numpy as np
 import pandas
@@ -11,13 +13,16 @@ import tifffile
 import yaml
 from pathlib import Path
 
+import zarr
+
 from speedrun import BaseExperiment, locate
 from speedrun.yaml_utils import recursive_update
 from .cellpose_training.start_training import start_cellpose_training
 
 from .gui_widgets.main_gui import StartingGUI
-from .io.images import read_uint8_img, write_image_to_file, write_ome_tiff
+from .io.images import read_uint8_img, write_image_to_file, write_ome_tiff, deduce_image_type, get_image_info_dict
 from .io.hdf5 import readHDF5, writeHDF5
+from .io.ome_zarr_utils import get_channel_list_in_ome_zarr, load_ome_zarr_channels
 from .preprocessing.utils import apply_preprocessing_to_image
 from .qupath import update_qupath_proj as qupath_utils
 from .qupath.save_labels import export_labels_from_qupath
@@ -55,6 +60,9 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         # Initialize or load dataframes:
         self._rois_df = None
+        self.input_images = InputImageDict(self, "input_images")
+        # TODO: Add ROIs to config file insetad of csv
+        self._rois_dict = InputImageDict(self, "rois")
         self._input_images_df = None
         self._init_rois()
         self._init_input_images_df()
@@ -225,101 +233,187 @@ class BaseAnnotationExperiment(BaseExperiment):
         else:
             return False, None
 
-    def get_image_paths(self, image_id):
+    def get_image_info(self,
+                       image_id: int,
+                       channels_to_load: Union[int, List[int], str] = None):
         """
-        Return a dictionary with the paths for each channel. The key of the dictionary is the channel name.
+        :param channels_to_load: "all", int, or list of ints
         """
-        if isinstance(image_id, str):
-            image_id = self.get_input_image_id_from_path(image_id)
-        assert image_id < self.nb_input_images, "Image ID not present in project"
-        image_data = self._input_images_df.loc[self._input_images_df["image_id"] == image_id]
-        ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
-        out_dict = {}
-        for i in range(2 + self.get("max_nb_extra_channels")):
-            path = image_data.iloc[0, i + 1]
-            if isinstance(path, str):
+        if channels_to_load == "all":
+            channels_to_load = [i for i in range(len(self.channel_names))]
+
+        channels_to_load = channels_to_load if isinstance(channels_to_load, list) else list(channels_to_load)
+        assert all(isinstance(ch, int) for ch in channels_to_load)
+
+        ch_images_dicts = []
+
+        all_image_ids = self.input_images.get_all_image_ids()
+        assert image_id in all_image_ids, f"Image ID not found: {image_id}"
+        img_info_dict = self.input_images[image_id]
+
+        for ch_idx, ch_name in enumerate(self.channel_names):
+            if ch_idx in img_info_dict:
+                ch_img_dict = self.input_images[image_id, int(ch_idx)]
+                ch_img_dict["channel_name"] = ch_name
+                if int(ch_idx) in channels_to_load:
+                    ch_img_dict["image"] = self.load_channel_img(img_info_dict=ch_img_dict)
+                ch_images_dicts.append(ch_img_dict)
+
+        return ch_images_dicts
+
+    def load_channel_img(self,
+                         img_info_dict: Dict = None,
+                         img_path: str = None,
+                         inner_channel_to_select: str = None,
+                         raise_if_could_not_load: bool = False,
+                         return_error_message: bool = False):
+        """
+        TODO: better format for path_dict could be (then update also the one for creating a new image!!)
+            1. utility that return such dict for a given image path
+            2. this method will simply add the loaded images to the dict (or return a list) or maybe just takes the dict of a channel
+            3. get image info will return the full list of dicts (maybe including the arrays)
+            4. use create_widget() to shorten things...?
+
+        [{"image_path": ...,
+        "channel_name": ...,
+        "image_type": ...,
+        "selected_inner_channel": ...,
+        "inner_channels": ...,
+        "image_array": ...}
+        ]
+        """
+        assert not(img_path is not None and img_info_dict is not None), "Either path or info dictionary should be given, " \
+                                                                   "not both"
+        if img_path is not None:
+            if isinstance(img_path, str) and img_path != "":
                 # If image is in the proj dir, then construct the absolute path:
-                if not os.path.isabs(path):
-                    path = os.path.join(self.experiment_directory, path)
-                out_dict[ch_names[i]] = path
-        return out_dict
+                if not os.path.isabs(img_path):
+                    img_path = os.path.join(self.experiment_directory, img_path)
+            img_info_dict = get_image_info_dict(img_path)
+
+            assert inner_channel_to_select is not None
+            img_info_dict["inner_channel_to_select"] = inner_channel_to_select
+        elif img_info_dict is None:
+            raise ValueError("At least path or info dictionary should be given")
+
+        image = None
+        img_path = img_info_dict["path"]
+        img_type = img_info_dict.get("type", None)
+        inner_channel_to_select = img_info_dict.get("inner_channel_to_select", None)
+        all_inner_channels = img_info_dict.get("all_inner_channels", None)
+        error_msg = None
+        if img_type is None:
+            error_msg = f"The given path is not a supported image " \
+                        f"(ome-zarr, png, tif): {img_path}"
+        else:
+            if ((img_type == "zarr") or ((img_type != "zarr") and (all_inner_channels is not None))) and \
+                    (inner_channel_to_select is None):
+                error_msg = f"Inner channel to select not given"
+            else:
+                if img_type == "zarr":
+                    try:
+                        image = load_ome_zarr_channels(img_path,
+                                           channels_to_select=[inner_channel_to_select])[0]
+                    except Exception as e:
+                        error_msg = traceback.format_exc()
+                else:
+                    try:
+                        image = read_uint8_img(img_path, add_all_channels_if_needed=False)
+                        if all_inner_channels is not None:
+                            if inner_channel_to_select not in all_inner_channels:
+                                error_msg = f"Image has channels {all_inner_channels} and channel " \
+                                            f"{inner_channel_to_select} was not found"
+                            else:
+                                # Deduce channel axis:
+                                assert image.ndim == 3
+                                ch_axis = image.shape.argmin()
+                                image = image.take(indices=int(inner_channel_to_select), axis=ch_axis)
+                    except Exception as e:
+                        error_msg = traceback.format_exc()
+
+        if error_msg is not None:
+            if raise_if_could_not_load:
+                raise ValueError(error_msg)
+            else:
+                print(f'Warning: {error_msg}')
+
+        if return_error_message:
+            return image, error_msg
+        else:
+            return image
 
     def add_input_image(self,
-                        main_image_path,
-                        main_image_filter=None,
-                        dapi_path=None,
-                        dapi_filter=None,
-                        extra_ch_1_path=None,
-                        extra_ch_1_filter=None,
-                        extra_ch_2_path=None,
-                        extra_ch_2_filter=None,
-                        id_input_image_to_rewrite=None,
-                        **extra_channels_kwargs
+                        img_info_dict,
+                        id_input_image_to_rewrite=None
                         ):
         """
         # TODO: add option to remove input image? In that case, I need to update self.nb_input_images
         """
-        # TODO: generalize to multiple extra channels
+        # Paths should have been validated by the ROI selection widget, so here we just add the dict to
+        # the proj config file:
 
-        assert len(extra_channels_kwargs) == 0, "Extra channels are not supported yet"
+        # Delete loaded images, if part of the dict:
+        dict_to_dump = deepcopy(img_info_dict)
+        for img_idx in dict_to_dump:
+            dict_to_dump[img_idx].pop('image', None)
 
-        # Validate main image path:
-        assert os.path.isfile(main_image_path), "'{}' is not a file!"
+        # def validate_ch_paths(ch_path, ch_name=None):
+        #     ch_path = None if ch_path == "" else ch_path
+        #     ch_name = None if ch_name == "" else ch_name
+        #     ch_type = None
+        #     if ch_path is not None:
+        #         ch_type = deduce_image_type(ch_path, raise_if_not_recognized=True)
+        #
+        #         if ch_type == "zarr":
+        #             zarr_channels = get_channel_list_in_ome_zarr(ch_path)
+        #             if ch_name is not None: assert ch_name in zarr_channels
+        #         elif ch_name is None:
+        #             # For an image, this should an integer
+        #             ch_name = int(ch_name)
+        #
+        #     # Convert to relative, if in proj_directory:
+        #     _, ch_path = self.is_path_in_exp_dir(ch_path)
+        #
+        #     return ch_path, ch_name, ch_type
 
-        # Convert to relative, if in proj_directory:
-        _, main_image_path = self.is_path_in_exp_dir(main_image_path)
+        # main_ch_path, main_ch_name, main_ch_type = validate_ch_paths(main_ch_path, main_ch_name)
+        # dapi_ch_path, dapi_ch_name, dapi_ch_type = validate_ch_paths(dapi_ch_path, dapi_ch_name)
+        # ch_2_path, ch_2_name, _ = validate_ch_paths(ch_2_path, ch_2_name)
+        # ch_3_path, ch_3_name, _ = validate_ch_paths(ch_3_path, ch_3_name)
+        #
+        # if main_ch_type == "zarr" and dapi_ch_path is None:
+        #     # For compatibility with SpaceM zarr files, automatically assign DAPI image to the same zarr file:
+        #     dapi_ch_path = main_ch_path
+        #     dapi_ch_type = "zarr"
 
-        def validate_ch_paths(ch_path, name_filter):
-            ch_path = None if ch_path == "" else ch_path
-            name_filter = None if name_filter == "" else name_filter
-            if ch_path is not None:
-                assert os.path.isfile(ch_path), "'{}' is not a file!"
-                # Convert to relative, if in proj_directory:
-                _, ch_path = self.is_path_in_exp_dir(ch_path)
-            else:
-                print("WARNING: filename filters outdated. No support for relative paths in proj dir")
-                if name_filter is not None:
-                    assert isinstance(main_image_filter,
-                                      str) and main_image_filter != "", "Please insert a proper filter string for main image"
-                    assert isinstance(name_filter,
-                                      str) and name_filter != "", "Wrong format for filter '{}'".format(name_filter)
-                    ch_path = main_image_path.replace(main_image_filter, name_filter)
-                    assert os.path.isfile(ch_path), "'{}' is not a file!"
-            return ch_path
+        # # If present, then set up the training to use it (cellpose can still train fine if some of the images do
+        # # not have DAPI channel):
+        # if dapi_ch_path is not None and (dapi_ch_name is not None or dapi_ch_type != "zarr"):
+        #     self.use_dapi_channel_for_segmentation = True
 
-        # Validate DAPI image:
-        dapi_image_path = validate_ch_paths(dapi_path, dapi_filter)
-
-        # If present, then set up the training to use it (cellpose can still train fine if some of the images do
-        # not have DAPI channel):
-        if dapi_image_path is not None:
-            self.use_dapi_channel_for_segmentation = True
-
-        # Validate extra channels:
-        extra_ch_1_path = validate_ch_paths(extra_ch_1_path, extra_ch_1_filter)
-        extra_ch_2_path = validate_ch_paths(extra_ch_2_path, extra_ch_2_filter)
-
-        # Add new image:
-        image_info = [main_image_path, dapi_image_path, extra_ch_1_path, extra_ch_2_path]
-        nb_input_images = self.nb_input_images
-
-        # Check if main image has already been added:
-        matching_images = self._input_images_df.index[self._input_images_df["main_path"] == main_image_path].tolist()
-        assert len(matching_images) <= 1
-        if len(matching_images) == 1:
-            print("The added image was already present in the project. Updating paths.")
-            id_input_image_to_rewrite = matching_images[0]
+        all_image_ids = self.input_images.get_all_image_ids()
 
         if id_input_image_to_rewrite is not None:
-            assert id_input_image_to_rewrite < nb_input_images
-        added_image_id = nb_input_images if id_input_image_to_rewrite is None else id_input_image_to_rewrite
-        self._input_images_df.loc[added_image_id] = [added_image_id] + image_info
-        self.dump_input_images_info()
+            assert id_input_image_to_rewrite in all_image_ids
+        else:
+            id_input_image_to_rewrite = 0 if len(all_image_ids) == 0 else np.array(all_image_ids).max() + 1
+        self.input_images[id_input_image_to_rewrite] = dict_to_dump
+
+        # # Check if main image has already been added:
+        # matching_images = self._input_images_df.index[self._input_images_df["ch_0_path"] == main_ch_path].tolist()
+        # assert len(matching_images) <= 1
+        # if len(matching_images) == 1:
+        #     print("The added image was already present in the project. Updating paths.")
+        #     id_input_image_to_rewrite = matching_images[0]
+        #
+        # added_image_id = nb_input_images if id_input_image_to_rewrite is None else id_input_image_to_rewrite
+        # self._input_images_df.loc[added_image_id] = [added_image_id] + image_info
+        # self.dump_input_images_info()
 
         # Refresh all the ROIs, if there were any:
-        self._create_training_images(self._get_roi_ids_by_image_id(added_image_id))
+        self._create_training_images(self._get_roi_ids_by_image_id(id_input_image_to_rewrite))
 
-        return added_image_id
+        return id_input_image_to_rewrite
 
     def dump_input_images_info(self):
         # Write data to file:
@@ -333,17 +427,17 @@ class BaseAnnotationExperiment(BaseExperiment):
 
     @property
     def nb_input_images(self):
-        assert self._input_images_df is not None
-        nb_input_images = self._input_images_df["image_id"].max()
-        return 0 if math.isnan(nb_input_images) else nb_input_images + 1
+        return len(self.input_images)
+        # assert self._input_images_df is not None
+        # nb_input_images = self._input_images_df["image_id"].max()
+        # return 0 if math.isnan(nb_input_images) else nb_input_images + 1
 
     def _init_input_images_df(self):
         if self._input_images_df is None:
             input_images_csv_path = os.path.join(self.experiment_directory, "ROIs/input_images.csv")
-            columns_names = ["image_id",
-                             "main_path",
-                             "DAPI_path"]
-            columns_names += ["extra_ch_{}_path".format(i) for i in range(self.get("max_nb_extra_channels"))]
+            columns_names = ["image_id"]
+            columns_names += [f"ch_{i + 2}_path" for i in range(self.get("max_nb_extra_channels") + 2)]
+            columns_names += [f"ch_{i + 2}_name" for i in range(self.get("max_nb_extra_channels") + 2)]
             if os.path.exists(input_images_csv_path):
                 self._input_images_df = pandas.read_csv(input_images_csv_path, index_col=None)
                 # TODO: remove image_id...?
@@ -377,14 +471,13 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         for roi_id in list_roi_ids:
             img_id = self.get_image_id_from_roi_id(roi_id)
-            image_paths = self.get_image_paths(img_id)
+            # FIXME: update these outputs
+            _, image_paths, _, ch_names, img_channels = self.get_image_info(img_id, channels_to_load="all")
             crop_slice = self.get_crop_slice_from_roi_id(roi_id)
             roi_paths = self.get_training_image_paths(roi_id)
 
-            # Load channels and apply crops:
-            ch_names = ["Main channel", "DAPI"] + self.get("extra_channels_names")
-            img_channels = [read_uint8_img(image_paths[ch_names[i]])[crop_slice] if ch_names[i] in image_paths else None
-                            for i in range(2 + self.get("max_nb_extra_channels"))]
+            # Apply crops:
+            img_channels = [img[crop_slice] for img in img_channels if img is not None]
 
             # ----------------------------
             # Cellpose training image:
@@ -427,7 +520,8 @@ class BaseAnnotationExperiment(BaseExperiment):
                         write_image_to_file(roi_paths["single_channels"][ch_names[i]], ch_image)
 
             if update_composite_images:
-                composite_image = np.stack([ch_image[..., 0] for ch_image in img_channels if ch_image is not None], axis=0)
+                composite_image = np.stack([ch_image[..., 0] for ch_image in img_channels if ch_image is not None],
+                                           axis=0)
                 write_ome_tiff(roi_paths["composite_image"], composite_image, axes="CYX",
                                channel_names=[ch_name for ch_name, ch in zip(ch_names, img_channels) if ch is not None],
                                channel_colors=[ch_color for ch_color, ch in zip(channel_colormaps, img_channels) if
@@ -692,6 +786,10 @@ class BaseAnnotationExperiment(BaseExperiment):
         self.dump_configuration()
 
     @property
+    def channel_names(self):
+        return ["Main channel", "DAPI"] + self.get("extra_channels_names")
+
+    @property
     def apply_preprocessing(self):
         if self.get("apply_preprocessing") is None:
             self.apply_preprocessing = False
@@ -702,7 +800,6 @@ class BaseAnnotationExperiment(BaseExperiment):
         assert isinstance(apply_preprocessing, bool)
         self.set("apply_preprocessing", apply_preprocessing)
         self.dump_configuration()
-
 
     def record_args(self):
         # Simulate sys.argv, so that configuration is loaded from the experiment directory:
@@ -751,3 +848,38 @@ class BaseAnnotationExperiment(BaseExperiment):
     @property
     def logger(self):
         return logging.getLogger(__name__)
+
+class InputImageDict():
+    def __init__(self,
+                 base_exp: BaseAnnotationExperiment,
+                 dict_key = "input_images"):
+        self.base_exp = base_exp
+        self.dict_key = dict_key
+
+    def __getitem__(self, idx):
+        if isinstance(idx, int):
+            return self.base_exp.get(f"{self.dict_key}/{idx}", ensure_exists=True)
+        elif isinstance(idx, tuple):
+            assert len(idx) == 2
+            return self.base_exp.get(f"{self.dict_key}/{idx[0]}/{idx[1]}", ensure_exists=True)
+        else:
+            raise ValueError(idx)
+
+    def __setitem__(self, idx, value):
+        assert isinstance(value, dict)
+        if isinstance(idx, int):
+            self.base_exp.set(f"{self.dict_key}/{idx}", value)
+        elif isinstance(idx, tuple):
+            assert len(idx) == 2
+            self.base_exp.set(f"{self.dict_key}/{idx[0]}/{idx[1]}", value)
+        else:
+            raise ValueError(idx)
+        self.base_exp.dump_configuration()
+
+    def __len__(self):
+        return len(self.base_exp.get(f"{self.dict_key}", {}))
+
+    def get_all_image_ids(self):
+        return [int(key) for key in self.base_exp.get(f"{self.dict_key}", {})]
+
+

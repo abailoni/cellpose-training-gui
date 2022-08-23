@@ -3,6 +3,10 @@ import cv2
 import imageio
 import os.path
 import tifffile
+import zarr
+from PIL import Image
+
+from traincellpose.io.ome_zarr_utils import get_channel_list_in_ome_zarr
 
 try:
     from ome_zarr.conversions import rgba_to_int
@@ -13,7 +17,6 @@ try:
     from paquo.colors import QuPathColor
 except ImportError:
     QuPathColor = None
-
 
 colormaps = {"gray": [255, 255, 255, 255],
              "red": [255, 0, 0, 255],
@@ -84,7 +87,7 @@ def read_uint8_img(img_path, add_all_channels_if_needed=True):
             img = cv2.convertScaleAbs(img, alpha=(255.0 / 65535.0))
         assert img.dtype == 'uint8'
     elif extension == ".png":
-        img = imageio.imread(img_path)
+        img = imageio.v3.imread(img_path)
     else:
         raise ValueError("Extension {} not supported".format(extension))
     if len(img.shape) == 2 and add_all_channels_if_needed:
@@ -94,3 +97,46 @@ def read_uint8_img(img_path, add_all_channels_if_needed=True):
     # assert len(img.shape) == 3 and img.shape[2] == 3, img.shape
 
     return img
+
+
+def deduce_image_type(image_path, raise_if_not_recognized=False):
+    image_type = None
+    if os.path.isdir(image_path):
+        # Try to open to see if it is a zarr directory
+        try:
+            zarr.convenience.open(image_path, mode="r")
+            image_type = "zarr"
+        except BaseException:
+            pass
+    elif os.path.isfile(image_path):
+        extension = os.path.splitext(image_path)[1]
+        if extension in [".tif", "tiff", ".png"]:
+            image_type = extension
+
+    if image_type is None and raise_if_not_recognized:
+        raise ValueError(f"Image not recognized. Only zarr, tiff, and png formats are supported: {image_path}")
+
+    return image_type
+
+
+def get_image_info_dict(img_path: str,
+                        channel_name: str = None):
+    out_dict = {"path": img_path}
+
+    img_type = deduce_image_type(img_path)
+    if img_type == "zarr":
+        out_dict["inner_channels"] = get_channel_list_in_ome_zarr(img_path)
+    elif img_type is not None:
+        # Check size image without reading it:
+        im = Image.open(img_path)
+        nb_img_channels = len(im.getbands())
+        if nb_img_channels != 1:
+            out_dict["inner_channels"] = [str(i) for i in range(nb_img_channels)]
+
+    out_dict["type"] = img_type
+
+    if channel_name is not None:
+        assert isinstance(channel_name, str)
+        out_dict["channel_name"] = channel_name
+
+    return out_dict
