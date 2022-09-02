@@ -89,20 +89,28 @@ class RoiSelectionWidget(Container):
         self.cur_img_info = {} if self.image_id is None else self.main_gui.project.input_images[self.image_id]
 
         # Create path-widgets and load images:
-        self.init_path_widgets()
+        err_messages = self.init_path_widgets()
+        err_messages = [None for _ in range(self.nb_channels)] if err_messages is None else err_messages
 
         if self.edit_image_paths_mode_active:
             # ----------------------------
             # Create interface to enter channels files:
             # ----------------------------
-            for path_widg, inner_path_widg, ch_name in self.paths_widgets:
-                container = widgets.Container(
-                    # layout="horizontal",
-                    layout="vertical",
-                    widgets=[path_widg, inner_path_widg],
-                    labels=False,
-                    label=ch_name)
-                self.extend([container])
+            for i, (path_widg, inner_path_widg, ch_name) in enumerate(self.paths_widgets):
+                # Only show widgets for channels that are already present in a project image
+                # (QuPath does not support a change of inner channels at the moment):
+                if (self.image_id is not None) and (self.cur_img_info.get(str(i), {}).get("image", None) is None) and \
+                        (err_messages[i] is None):
+                    path_widg.visible = False
+                    inner_path_widg.visible = False
+                else:
+                    container = widgets.Container(
+                        # layout="horizontal",
+                        layout="vertical",
+                        widgets=[path_widg, inner_path_widg],
+                        labels=False,
+                        label=ch_name)
+                    self.extend([container])
                 # self.extend([path_widg, inner_path_widg])
 
             # ----------------------------
@@ -132,7 +140,7 @@ class RoiSelectionWidget(Container):
                 dict_to_save_to_proj = self.check_images_loaded_in_img_dict()
 
                 if dict_to_save_to_proj is not None:
-                    self.image_id = self.main_gui.project.add_input_image(self.cur_img_info,
+                    self.image_id = self.main_gui.project.add_input_image(dict_to_save_to_proj,
                                                                           id_input_image_to_rewrite=self.image_id)
                     # if self.image_id is not None:
                     #     self.select_roi_button.visible = True
@@ -149,10 +157,16 @@ class RoiSelectionWidget(Container):
         else:
             assert self.image_id is not None
 
+            # Hide path widgets:
+            for path_widg, inner_path_widg, ch_name in self.paths_widgets:
+                path_widg.visible = False
+                inner_path_widg.visible = False
+
             # ---------------------------------------
             # Add buttons to go back to edit mode:
             # ---------------------------------------
-            self.update_image_paths_button = PushButton(name="update_image_paths", text="Update Image Paths")
+            self.update_image_paths_button = PushButton(name="update_image_paths", text="Update channel paths for "
+                                                                                        "selected Image")
 
             @self.update_image_paths_button.changed.connect
             def update_image_paths():
@@ -393,7 +407,7 @@ class RoiSelectionWidget(Container):
 
                             # Possibly set the default selected inner-channel:
                             inner_specs_wid.is_being_updated = False
-                            if ch_idx in default_inner_channels_choices:
+                            if ch_idx in default_inner_channels_choices and img_info_dict["type"] == "zarr":
                                 # img_info_dict["inner_channel_to_select"] = default_inner_channels_choices[ch_idx]
                                 # self.cur_img_info[str(ch_idx)] = img_info_dict
                                 self.logger.warning(f"Set value to '{default_inner_channels_choices[ch_idx]}':")
@@ -509,8 +523,10 @@ class RoiSelectionWidget(Container):
         if err_messages is not None:
             for idx, err in enumerate(err_messages):
                 if err is not None:
-                    show_message_pop_up(f"It was not possible to load channel {self.channel_names[idx]}! Check and "
-                                        f"edit the image paths. \n \n Info message: {err}")
+                    # show_message_pop_up(err)
+                    show_message_pop_up(f"Channel {self.channel_names[idx]} not found! Check and "
+                                        f"edit the image paths: {err}")
+        return err_messages
 
     def load_napari_layers(self,
                            ch_indices: Union[int, List[int]] = None,
@@ -529,7 +545,7 @@ class RoiSelectionWidget(Container):
         channel_colormaps = ["gray", "red", "yellow", "cyan"]
 
         img_info_dict = self.cur_img_info
-        error_msg_collected = []
+        error_msg_collected = [None for _ in range(self.nb_channels)]
         for ch_idx, layer_name in enumerate(self.channel_names):
             if ch_idx in ch_indices:
                 remove_layer = True
@@ -538,23 +554,28 @@ class RoiSelectionWidget(Container):
                     if try_to_load_image:
                         path = ch_info_dict.get("path", None)
                         inner_channel_to_select = ch_info_dict.get("inner_channel_to_select", None)
-                        if (path is not None and path != "") and \
-                                (inner_channel_to_select is not None and inner_channel_to_select != ""):
-                            ch_info_dict["image"], error_msg = self.main_gui.project.load_channel_img(ch_info_dict,
-                                                                                                      return_error_message=True)
-                            error_msg_collected.append(error_msg)
+                        if (path is not None and path != ""):
+                            # and \
+                            # (inner_channel_to_select is not None and inner_channel_to_select != ""):
+                            ch_info_dict["image"], error_msg = \
+                                self.main_gui.project.load_channel_img(ch_info_dict,
+                                                                       return_error_message=True)
+                            error_msg_collected[ch_idx] = error_msg
                     image_data = ch_info_dict.get("image", None)
                     if image_data is not None and isinstance(image_data, np.ndarray):
                         remove_layer = False
                         if layer_name in loaded_layer_names:
-                            layer_idx = layers.index(layer_name)
-                            layers[layer_idx].data = image_data
+                            # layer_idx = layers.index(layer_name)
+                            layers[layer_name].data = image_data
                         else:
                             viewer.add_image(image_data,
                                              name=layer_name,
                                              colormap=channel_colormaps[ch_idx],
                                              blending='additive'
                                              )
+                        layers[layer_name].contrast_limits = (image_data.min(), image_data.max())
+                        # new_layer.contrast_limits = (image_data.min(), image_data.max())
+                        # new_layer.contrast_limits_range = (image_data.min(), image_data.max())
 
                 # Check if I should remove a layer:
                 if remove_layer and (layer_name in loaded_layer_names):
@@ -571,8 +592,10 @@ class RoiSelectionWidget(Container):
             assert self.image_id is not None
             napari_rois = self.main_gui.project.get_napari_roi_by_image_id(self.image_id)
             viewer.add_shapes(data=napari_rois, name=shape_layer_name,
-                              shape_type="rectangle", opacity=0.15, edge_color='#fff01dff',
-                              face_color='#f9ffbeff')
+                              shape_type="rectangle", opacity=0.60, edge_color='#00007fff',
+                              face_color='#0055ffff')
+            # shape_type="rectangle", opacity=0.15, edge_color='#fff01dff',
+            # face_color='#f9ffbeff')
 
         if any(err is not None for err in error_msg_collected):
             return error_msg_collected
