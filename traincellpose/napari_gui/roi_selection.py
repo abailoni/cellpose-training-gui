@@ -150,7 +150,8 @@ class RoiSelectionWidget(Container):
                     self.edit_image_paths_mode_active = False
                     self._setup_gui()
                 else:
-                    show_napari_error_message("First, you should at least specify a valid image as main segmentation channel")
+                    show_napari_error_message(
+                        "First, you should at least specify a valid image as main segmentation channel")
 
             self.extend([self.save_image_paths_button])
 
@@ -277,6 +278,8 @@ class RoiSelectionWidget(Container):
         img_info_dict = self.cur_img_info
         assert img_info_dict is not None
 
+        # TODO: Reload napari layers, if any in dict
+
         total_nb_channels = len(self.channel_names)
 
         tooltips_path_widg = [
@@ -289,13 +292,33 @@ class RoiSelectionWidget(Container):
             f"The selected image for `{ch}` is multichannel. Choose one channel to load." for ch in
             self.channel_names
         ]
+
         # labels_inner_ch_specs_widg = [
         #     f"`{ch}` is multichannel. Choose which channel to load in napari " for ch in self.channel_names
         # ]
 
+        def combo_choices_napari_layers(combobox_widg):
+            return [lay.name for lay in self.main_gui.roi_select_viewer.layers]
+
         for i in range(total_nb_channels):
-            # Construct path widget:
+
+            # ---------------- NEW --------------------------
+            # Test combobox with list of layers in Napari:
+            combobox_kwargs = {
+                "choices": combo_choices_napari_layers,
+                "allow_multiple": False,
+                "label": self.channel_names[i]
+            }
+
             ch_info_dict = img_info_dict.get(f"{i}", {})
+            selected_nap_layer = ch_info_dict.get("napari_layer_name", None),
+            if selected_nap_layer is not None:
+                combobox_kwargs["value"] = selected_nap_layer
+
+            widgets.ComboBox(**combobox_kwargs)
+            # ---------------- NEW (end) --------------------------
+
+            # Construct path widget:
             self._path_widgets.append(widgets.FileEdit(
                 name=f"path_ch_{i}", tooltip=tooltips_path_widg[i],
                 # mode=None,
@@ -527,7 +550,7 @@ class RoiSelectionWidget(Container):
                 if err is not None:
                     # show_napari_error_message(err)
                     show_napari_error_message(f"Channel {self.channel_names[idx]} not found! Check and "
-                                        f"edit the image paths: {err}")
+                                              f"edit the image paths: {err}")
         return err_messages
 
     def load_napari_layers(self,
