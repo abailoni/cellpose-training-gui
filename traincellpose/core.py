@@ -26,7 +26,7 @@ from .io.ome_zarr_utils import get_channel_list_in_ome_zarr, load_ome_zarr_chann
 from .preprocessing.utils import apply_preprocessing_to_image
 from .qupath import update_qupath_proj as qupath_utils
 from .qupath.save_labels import export_labels_from_qupath
-from .io.various import yaml2dict, get_path_components, open_path
+from .io.various import yaml2dict, get_path_components, open_path, recursive_dict_update
 from .qupath.update_qupath_proj import add_image_to_project
 
 
@@ -119,7 +119,7 @@ class BaseAnnotationExperiment(BaseExperiment):
                     crop_slices = self._get_crop_slice_from_roi_array(added_roi)
                     for loc_crop_slice in crop_slices:
                         # Check if any slice is less than 20px:
-                        if loc_crop_slice.stop - loc_crop_slice.start < 20:
+                        if loc_crop_slice.stop - loc_crop_slice.start < 60:
                             rois_not_already_in_project[i] = False
 
             self._napari_rois = np.concatenate([self._napari_rois, new_napari_rois[rois_not_already_in_project]])
@@ -335,6 +335,8 @@ class BaseAnnotationExperiment(BaseExperiment):
                             if image.ndim != 2:
                                 image = None
                     except Exception as e:
+                        # error_msg = "".join(traceback.format_exception(e, ))
+                        print("passed here!!!")
                         error_msg = traceback.format_exc()
 
         if error_msg is not None:
@@ -642,6 +644,31 @@ class BaseAnnotationExperiment(BaseExperiment):
         else:
             raise ValueError("Labeling tool not recognized")
 
+        # TODO: delete ROIs that are not annotated (no cells in it)
+        imgs_to_delete = []
+        any_training_image_left = False
+        for root, dirs, files in os.walk(training_images_dir, topdown=False):
+            for name in files:
+                if name.endswith("masks.tif"):
+                    full_path = os.path.join(root, name)
+                    masks = read_uint8_img(full_path, add_channel_axis_if_needed=False)
+                    print(masks.shape)
+                    if masks.max() == 0:
+                        imgs_to_delete.append(full_path)
+                        # Also remove associated raw image:
+                        imgs_to_delete.append(full_path.replace("_masks", ""))
+                    else:
+                        any_training_image_left = True
+
+        for path in imgs_to_delete:
+            print(f"removing {path}...")
+            os.remove(path)
+
+        if not any_training_image_left:
+            # Delete created folder:
+            shutil.rmtree(training_folder)
+            return "All of the ROIs are empty and do not contain any annotation!"
+
         # Zip files and open the folder:
         shutil.make_archive(training_folder, 'zip', training_folder)
         if show_training_folder:
@@ -657,6 +684,9 @@ class BaseAnnotationExperiment(BaseExperiment):
         training_folder = os.path.join(self.experiment_directory, "CellposeTraining", model_name)
         training_images_dir = os.path.join(training_folder, "training_images")
         training_config_path = os.path.join(training_folder, "train_config.yml")
+        if not (os.path.exists(training_folder) and os.path.exists(training_images_dir) and
+                os.path.exists(training_config_path)):
+            return False, "Training data not found, first click on `Prepare and Export Training Data`"
         if not os.path.exists(training_folder) or not os.path.exists(training_images_dir) or not os.path.exists(
                 training_config_path):
             self.setup_cellpose_training_data(model_name)
@@ -715,7 +745,10 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         # Write to main config:
         old_training_config = self.get("training_config", ensure_exists=True)
-        old_training_config.update(training_config)
+        print("Config before: ", old_training_config)
+        old_training_config = recursive_dict_update(training_config, old_training_config)
+        # old_training_config.update(training_config)
+        print("Config before: ", old_training_config)
         self.set("training_config", old_training_config)
         self.dump_configuration()
 

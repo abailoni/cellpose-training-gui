@@ -18,7 +18,7 @@ from magicgui.widgets import (
 )
 from psygnal import Signal
 
-from .gui_utils import show_message_pop_up
+from .gui_utils import show_napari_error_message
 from ..io.images import read_uint8_img, deduce_image_type, get_image_info_dict
 
 
@@ -150,7 +150,7 @@ class RoiSelectionWidget(Container):
                     self.edit_image_paths_mode_active = False
                     self._setup_gui()
                 else:
-                    show_message_pop_up("First, you should at least specify a valid image as main segmentation channel")
+                    show_napari_error_message("First, you should at least specify a valid image as main segmentation channel")
 
             self.extend([self.save_image_paths_button])
 
@@ -224,7 +224,7 @@ class RoiSelectionWidget(Container):
         # Display message:
         if info_message is not None:
             assert isinstance(info_message, str)
-            show_message_pop_up(info_message)
+            show_napari_error_message(info_message)
             # self.append(widgets.Label(value=info_message))
 
         self.logger.debug("Done creating napari gui")
@@ -298,6 +298,8 @@ class RoiSelectionWidget(Container):
             ch_info_dict = img_info_dict.get(f"{i}", {})
             self._path_widgets.append(widgets.FileEdit(
                 name=f"path_ch_{i}", tooltip=tooltips_path_widg[i],
+                # mode=None,
+                # mode='r',
                 mode=FileDialogMode.EXISTING_FILE,
                 label=self.channel_names[i],
                 value=ch_info_dict.get("path", ""),
@@ -433,7 +435,7 @@ class RoiSelectionWidget(Container):
                                                              choices_to_keep=[""])
                             # inner_specs_wid.reset_choices()
                             inner_specs_wid.visible = False
-                            show_message_pop_up(error_msg)
+                            show_napari_error_message(error_msg)
                         elif image_data_has_been_updated and ch_idx == 0 and img_info_dict.get("type", None) == "zarr":
                             # Try to set DAPI channel automatically if we have zarr:
                             dapi_path_wid = self._path_widgets[1]
@@ -482,7 +484,7 @@ class RoiSelectionWidget(Container):
                             img_info_dict["image"], error_msg = self.main_gui.project.load_channel_img(img_info_dict,
                                                                                                        return_error_message=True)
                             if error_msg is not None:
-                                show_message_pop_up(error_msg)
+                                show_napari_error_message(error_msg)
                                 inner_specs_wid.value = ""
                             # else:
                             #     image_data_has_been_updated = True
@@ -510,7 +512,7 @@ class RoiSelectionWidget(Container):
                                                 try_to_load_image=False,
                                                 update_roi_layer=False)
             if error_msg is not None:
-                show_message_pop_up(error_msg[ch_idx])
+                show_napari_error_message(error_msg[ch_idx])
 
         # Link widgets to callback function:
         for wid in self._path_widgets + self._inner_ch_specs_widgets:
@@ -523,8 +525,8 @@ class RoiSelectionWidget(Container):
         if err_messages is not None:
             for idx, err in enumerate(err_messages):
                 if err is not None:
-                    # show_message_pop_up(err)
-                    show_message_pop_up(f"Channel {self.channel_names[idx]} not found! Check and "
+                    # show_napari_error_message(err)
+                    show_napari_error_message(f"Channel {self.channel_names[idx]} not found! Check and "
                                         f"edit the image paths: {err}")
         return err_messages
 

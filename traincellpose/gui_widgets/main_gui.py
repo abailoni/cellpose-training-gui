@@ -9,7 +9,7 @@ from magicgui.widgets import (
     PushButton,
 )
 
-from ..napari_gui.gui_utils import show_message_pop_up
+from ..napari_gui.gui_utils import show_message_pop_up_in_separate_window
 from ..napari_gui.roi_selection import RoiSelectionWidget
 from ..napari_gui.roi_labeling import RoiLabeling
 from ..qupath.update_qupath_proj import update_paths_images_in_project
@@ -57,7 +57,7 @@ class StartingGUI(Container):
         def see_cellpose_input():
             rois_list = self.project.get_roi_list()
             if len(rois_list) == 0:
-                show_message_pop_up("No region of interest has been selected yet")
+                show_message_pop_up_in_separate_window("No region of interest has been selected yet")
             else:
                 self.project.show_cellpose_input_folder()
 
@@ -65,7 +65,7 @@ class StartingGUI(Container):
         def qupath_zip():
             rois_list = self.project.get_roi_list()
             if len(rois_list) == 0:
-                show_message_pop_up("No region of interest has been selected yet")
+                show_message_pop_up_in_separate_window("No region of interest has been selected yet")
             else:
                 self.project.compress_qupath_proj_dir()
 
@@ -111,7 +111,7 @@ class StartingGUI(Container):
         rois_list = self.project.get_roi_list()
         if len(rois_list) == 0:
             self.show_starting_gui()
-            show_message_pop_up("First select some regions of interest!")
+            show_message_pop_up_in_separate_window("First select some regions of interest!")
         else:
             labeling_tool = self.labeling_tool_combobox.value
             if labeling_tool == "QuPath":
@@ -135,7 +135,7 @@ class StartingGUI(Container):
                     # print(result.stderr)
                 except subprocess.CalledProcessError:
                     self.show_starting_gui()
-                    show_message_pop_up("QuPath could not be started. Make sure that it is installed.")
+                    show_message_pop_up_in_separate_window("QuPath could not be started. Make sure that it is installed.")
                     pass
             elif labeling_tool == "Napari":
                 # Create a napari viewer with an additional widget:
@@ -156,7 +156,7 @@ class StartingGUI(Container):
         rois_list = self.project.get_roi_list()
         if len(rois_list) == 0:
             self.show_starting_gui()
-            show_message_pop_up("First select some regions of interest!")
+            show_message_pop_up_in_separate_window("First select some regions of interest!")
         else:
             # Clear and hide the current GUI interface:
             self.clear()
@@ -290,14 +290,16 @@ class StartingGUI(Container):
             @setup_training_data_button.changed.connect
             def setup_training_data():
                 if self.is_valid_training_config():
-                    self.project.setup_cellpose_training_data(self.model_name.value, show_training_folder=True)
+                    out_message = self.project.setup_cellpose_training_data(self.model_name.value, show_training_folder=True)
+                    if out_message is not None:
+                        show_message_pop_up_in_separate_window(out_message)
 
             @start_training_button.changed.connect
             def start_training():
                 if self.is_valid_training_config():
                     training_was_successful, error_message = self.project.run_cellpose_training(self.model_name.value)
                     message = "Model training completed!" if training_was_successful else error_message
-                    show_message_pop_up(message)
+                    show_message_pop_up_in_separate_window(message)
 
             self.extend([
                 self.model_name,
@@ -320,12 +322,12 @@ class StartingGUI(Container):
 
     def is_valid_training_config(self):
         if " " in self.model_name.value:
-            show_message_pop_up("The model name should not contain spaces")
+            show_message_pop_up_in_separate_window("The model name should not contain spaces")
             return False
         try:
             float(self.learning_rate.value)
         except ValueError:
-            show_message_pop_up("The learning rate should be a float number")
+            show_message_pop_up_in_separate_window("The learning rate should be a float number")
             return False
         self.update_main_training_config()
         return True
@@ -340,6 +342,6 @@ class StartingGUI(Container):
         }
         was_updated, error_message = self.project.update_main_training_config(self.model_name.value, **training_kwargs)
         if not was_updated:
-            show_message_pop_up(error_message)
+            show_message_pop_up_in_separate_window(error_message)
 
     # self.model_name.value

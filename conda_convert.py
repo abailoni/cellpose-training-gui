@@ -23,6 +23,7 @@ def main():
         for platform in ["linux-64", "win-64"]:
             # Convert package to other platforms:
             command = "conda convert {} -p {} -o {}".format(path, platform, out_folder)
+            print(command)
             os.system(command)
 
             # Now upload on anaconda:
@@ -32,6 +33,7 @@ def main():
                     "--force" if args.force else "",
                     out_package
                 )
+                print(upload_command)
                 os.system(upload_command)
 
 
