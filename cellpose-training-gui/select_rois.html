@@ -245,7 +245,12 @@
 <li><p><strong>DAPI channel</strong>: If available, add a DAPI channel because it often improves segmentation results</p></li>
 <li><p><strong>Extra channels</strong>: If you have additional channels that may be helpful for the manual annotation process, you can load them. They won’t be used by the segmentation algorithm though.</p></li>
 </ul>
-<p>After you select the files with the image channels, click on <em>Update Displayed Image Channels</em>. This will add the image to the project and the image channels will be loaded in napari in different colors.</p>
+<p>At the moment you can load images in <code class="docutils literal notranslate"><span class="pre">.tif</span></code>, <code class="docutils literal notranslate"><span class="pre">.png</span></code>, and <code class="docutils literal notranslate"><span class="pre">zarr</span></code> formats (currently working on adding compatibility with all image formats supported by Napari). If the loaded image (or zarr group) has multiple channels or sub-images in it, an additional choice-box will appear, letting you choose the channel you want to use.</p>
+<p>After you select the files with the image channels, click on <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">selected</span> <span class="pre">images</span> <span class="pre">to</span> <span class="pre">annotation</span> <span class="pre">project</span></code>. This will add the image to the project.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>ZARR images</strong>: Currently, if you click on <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">File</span></code> you will only be able to select files, but not directories. Thus, if you want to load a zarr image, you can either paste the path of the zarr folder directly into the path field, or you can click on <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">file</span></code> button and then select the <code class="docutils literal notranslate"><span class="pre">.zarray</span></code> or <code class="docutils literal notranslate"><span class="pre">.zgroup</span></code> files included in the zarr folder of the image (for this, you may need to set your OS to display hidden files).</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you copy the images that you want to add to the project into the <code class="docutils literal notranslate"><span class="pre">traincellpose</span></code> project directory itself (for example in the <code class="docutils literal notranslate"><span class="pre">input_images</span></code> subdirectory), then only relative paths will be stored and the input images will be found even if you later decide to move your annotation project directory to another location or another machine.</p>
@@ -258,7 +263,7 @@
 </section>
 <section id="updating-image-channels">
 <h3>Updating image channels<a class="headerlink" href="#updating-image-channels" title="Permalink to this headline">¶</a></h3>
-<p>At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the <code class="docutils literal notranslate"><span class="pre">Update</span> <span class="pre">Displayed</span> <span class="pre">Image</span> <span class="pre">Channels</span></code> button.</p>
+<p>At any moment, you can update the channel paths of an image added to the project. Select the image you want to update, click on <code class="docutils literal notranslate"><span class="pre">Update</span> <span class="pre">channel</span> <span class="pre">paths</span> <span class="pre">for</span> <span class="pre">selected</span> <span class="pre">image</span></code>, update the paths, and then click on the <code class="docutils literal notranslate"><span class="pre">Update</span> <span class="pre">image</span> <span class="pre">paths</span> <span class="pre">in</span> <span class="pre">annotation</span> <span class="pre">project</span></code> button.</p>
 </section>
 </section>
 <section id="selecting-regions-of-interest-in-napari">
