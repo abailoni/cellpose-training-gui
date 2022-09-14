@@ -352,6 +352,11 @@ class RoiSelectionWidget(Container):
                 update_image_data = True
                 self.logger.debug(f"Updating path-widg {ch_idx}...")
 
+                # FIXME: this will be fixed when we load info from Napari layers:
+                if str(value).endswith(".zgroup") or str(value).endswith(".zarray"):
+                    zarr_dir, _ = os.path.split(str(value))
+                    value = pathlib.PosixPath(zarr_dir)
+
                 # Check if a valid image-data was already loaded:
                 old_img_info_dict = self.cur_img_info.get(str(ch_idx), {})
                 old_image_data = old_img_info_dict.get("image", None)
