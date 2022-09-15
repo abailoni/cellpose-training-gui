@@ -10,7 +10,7 @@ setuptools.setup(
     description="Library for annotating singe-cell microscopy images",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.2.1",
+    version="0.2.2",
     packages=setuptools.find_packages(),
     entry_points = {
         'console_scripts': [
