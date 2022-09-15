@@ -46,12 +46,19 @@ After you select the files with the image channels, click on `Add selected image
 
 ::::{note}
 **ZARR images**: Currently, if you click on `Select File` you will only be able to select files, but not directories. Thus, if you want to load a zarr image, you can either paste the path of the zarr folder directly into the path field, or you can click on `Select file` button and then select the `.zarray` or `.zgroup` files included in the zarr folder of the image (for this, you may need to set your OS to display hidden files).
+:::{image} ./images/add-zarr-image.jpg
+:alt: Add a zarr image
+:width: 60%
+:align: center
+:::
 ::::
 
 
 ::::{tip}
 If you copy the images that you want to add to the project into the `traincellpose` project directory itself (for example in the `input_images` subdirectory), then only relative paths will be stored and the input images will be found even if you later decide to move your annotation project directory to another location or another machine.
 ::::
+
+
 
 
 ### Browsing images in the project and adding new ones
