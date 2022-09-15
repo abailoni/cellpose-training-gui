@@ -745,10 +745,7 @@ class BaseAnnotationExperiment(BaseExperiment):
 
         # Write to main config:
         old_training_config = self.get("training_config", ensure_exists=True)
-        print("Config before: ", old_training_config)
         old_training_config = recursive_dict_update(training_config, old_training_config)
-        # old_training_config.update(training_config)
-        print("Config before: ", old_training_config)
         self.set("training_config", old_training_config)
         self.dump_configuration()
 
