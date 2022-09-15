@@ -98,18 +98,19 @@ class RoiLabeling(Container):
                 layers.remove(name)
 
         # Now add new layers:
+        image = None
         for i, name in enumerate(roi_paths["single_channels"]):
             if roi_paths["single_channels"][name] is not None:
                 image = read_uint8_img(roi_paths["single_channels"][name])
-                viewer.add_image(image[..., 0],
+                viewer.add_image(image[0],
                                  name=name,
                                  colormap=channel_colormaps[i],
                                  blending="additive")
+        if image is not None:
+            annotations = imageio.v3.imread(roi_paths["label_image"]) if roi_paths["has_labels"] else np.zeros(
+                shape=image.shape[1:], dtype='uint16')
 
-        annotations = imageio.imread(roi_paths["label_image"]) if roi_paths["has_labels"] else np.zeros(
-            shape=image.shape[:2], dtype='uint16')
-
-        # Load images in napari:
-        if self.annotation_layer_name in loaded_layer_names:
-            layers.remove(self.annotation_layer_name)
-        viewer.add_labels(annotations, name=self.annotation_layer_name)
+            # Load images in napari:
+            if self.annotation_layer_name in loaded_layer_names:
+                layers.remove(self.annotation_layer_name)
+            viewer.add_labels(annotations, name=self.annotation_layer_name)

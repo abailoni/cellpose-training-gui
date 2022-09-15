@@ -1,6 +1,6 @@
 package:
   name: traincellpose
-  version: 0.2.0
+  version: 0.2.1
 
 source:
   path: ..
@@ -22,10 +22,11 @@ requirements:
     - speedrun
     - tifffile
     - ome-zarr
-    - napari
+    - napari >=0.4.16
     - magicgui
     - pyqt
     - paquo
+    - napari-ome-zarr
 
 test:
   imports:
@@ -33,10 +34,15 @@ test:
     - traincellpose.core
     - traincellpose.napari_gui.roi_selection
 #    - paquo #  QuPath dependency
+  requires:
+    - pip
+    - pytest
+    - napari[dev]
   source_files:
     - tests/**/*.py
   commands:
-    - python -m unittest discover -s test -v
+#    - python -m unittest discover -s test -v
+    - pytest tests/
 
 about:
   home: https://github.com/abailoni/cellpose-training-gui

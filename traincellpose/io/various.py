@@ -37,3 +37,15 @@ def open_path(path):
         except FileNotFoundError:
             # Try with XFCE file manager:
             subprocess.Popen(["thunar", path])
+
+def recursive_dict_update(source, target, zero_depth=True):
+    # if zero_depth:
+    #     pass
+        # target = deepcopy(target)
+    for key, value in source.items():
+        if isinstance(value, dict):
+            sub_target = target[key] if key in target else {}
+            target[key] = recursive_dict_update(source[key], sub_target, zero_depth=False)
+        else:
+            target[key] = source[key]
+    return target

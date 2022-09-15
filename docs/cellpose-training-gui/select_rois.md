@@ -39,7 +39,15 @@ For each image, you can add up to four channels:
 - **DAPI channel**: If available, add a DAPI channel because it often improves segmentation results
 - **Extra channels**: If you have additional channels that may be helpful for the manual annotation process, you can load them. They won't be used by the segmentation algorithm though.
 
-After you select the files with the image channels, click on _Update Displayed Image Channels_. This will add the image to the project and the image channels will be loaded in napari in different colors.
+At the moment you can load images in `.tif`, `.png`, and `zarr` formats (currently working on adding compatibility with all image formats supported by Napari). If the loaded image (or zarr group) has multiple channels or sub-images in it, an additional choice-box will appear, letting you choose the channel you want to use. 
+
+After you select the files with the image channels, click on `Add selected images to annotation project`. This will add the image to the project.
+
+
+::::{note}
+**ZARR images**: Currently, if you click on `Select File` you will only be able to select files, but not directories. Thus, if you want to load a zarr image, you can either paste the path of the zarr folder directly into the path field, or you can click on `Select file` button and then select the `.zarray` or `.zgroup` files included in the zarr folder of the image (for this, you may need to set your OS to display hidden files).
+::::
+
 
 ::::{tip}
 If you copy the images that you want to add to the project into the `traincellpose` project directory itself (for example in the `input_images` subdirectory), then only relative paths will be stored and the input images will be found even if you later decide to move your annotation project directory to another location or another machine.
@@ -57,7 +65,7 @@ After adding the first image, you can add another image by selecting the _"Add n
 
 
 ### Updating image channels
-At any moment, you can update the channel paths of an image added to the project. Simply update the path and then click again on the `Update Displayed Image Channels` button.
+At any moment, you can update the channel paths of an image added to the project. Select the image you want to update, click on `Update channel paths for selected image`, update the paths, and then click on the `Update image paths in annotation project` button.
 
 ## Selecting regions of interest in Napari
 Once you selected an image in your project, you will see that a new shapes layer named "_Regions of interest_" has been loaded in Napari.
