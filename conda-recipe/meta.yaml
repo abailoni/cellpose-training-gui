@@ -27,6 +27,8 @@ requirements:
     - pyqt
     - paquo
     - napari-ome-zarr
+    - imageio-ffmpeg
+
 
 test:
   imports:

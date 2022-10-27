@@ -14,13 +14,16 @@ dependencies:
   - tifffile
   - ome-zarr
   - napari
-  - napari-ome-zarr
   - magicgui
+  - napari-ome-zarr
   - pyqt
   - imageio-ffmpeg
-  - abailoni::speedrun
-  - abailoni::paquo
-#- # New zarr tools from Andreas
+  # paquo deps
+  - jpype1>=1.0.1
+  - dynaconf>=3,!=3.1.0,!=3.1.7
+  - ome-types  # [ WITH_OME ]
+  - shapely
+  # New zarr tools from Andreas
   - dask-image
   - dask
 

@@ -1,6 +1,7 @@
 scipy
 h5py
 imageio
+imageio-ffmpeg
 opencv-python-headless
 pyyaml
 tifffile
