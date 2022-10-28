@@ -58,7 +58,7 @@ jobs:
 
       - name: Update environment
         run:  | 
-              pip install --no-cache-dir -r ./requirements.txt -r ./requirements_dev.txt
+              pip install --no-cache-dir -r ./requirements.txt -r ./requirements-dev.txt
               mamba list
               mamba info --all
 #        if: steps.cache.outputs.cache-hit != 'true'
