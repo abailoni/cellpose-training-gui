@@ -12,8 +12,8 @@ on:
 #  schedule:
 #    - cron: '0 0 * * *'
 
-env:
-  CACHE_NUMBER: 0  # increase to reset cache manually
+#env:
+#  CACHE_NUMBER: 0  # increase to reset cache manually
 
 jobs:
   build:
@@ -46,22 +46,22 @@ jobs:
             activate-environment: my-env
             use-mamba: true
 
-      - name: Set cache date
-        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
-      - uses: actions/cache@v2
-        with:
-          path: ${{ matrix.prefix }}
-          key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
-        id: cache
+#      - name: Set cache date
+#        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+#
+#      - uses: actions/cache@v2
+#        with:
+#          path: ${{ matrix.prefix }}
+#          key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+#        id: cache
+#          mamba env update -n my-env -f environment.yml
 
       - name: Update environment
-        run: | 
-#          mamba env update -n my-env -f environment.yml
-          pip install --no-cache-dir -r ./requirements.txt -r ./requirements_dev.txt
-          mamba list
-          mamba info --all
-        if: steps.cache.outputs.cache-hit != 'true'
+        run:  | 
+              pip install --no-cache-dir -r ./requirements.txt -r ./requirements_dev.txt
+              mamba list
+              mamba info --all
+#        if: steps.cache.outputs.cache-hit != 'true'
 #
 #      - name: Install PtAC (name of my own python package)
 #          run: |
