@@ -9,8 +9,8 @@ on:
     branches:
       - '*'
 
-  schedule:
-    - cron: '0 0 * * *'
+#  schedule:
+#    - cron: '0 0 * * *'
 
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
@@ -56,8 +56,18 @@ jobs:
         id: cache
 
       - name: Update environment
-        run: mamba env update -n my-env -f environment.yml
+        run: | 
+#          mamba env update -n my-env -f environment.yml
+          pip install --no-cache-dir -r ./requirements.txt -r ./requirements_dev.txt
+          mamba list
+          mamba info --all
         if: steps.cache.outputs.cache-hit != 'true'
+#
+#      - name: Install PtAC (name of my own python package)
+#          run: |
+#            python setup.py install
+#            conda list
+#            conda info --all
 
       - name: Run tests
         shell: bash -l {0}
