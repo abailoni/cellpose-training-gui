@@ -1,7 +1,6 @@
 name: traincellpose
 channels:
   - conda-forge
-  - fastai
   - defaults
 dependencies:
   - python<=3.9
@@ -9,7 +8,7 @@ dependencies:
   - h5py
   - imageio
   - opencv
-  - opencv-python-headless # -c fastai, is it needed?
+  - fastai::opencv-python-headless # -c fastai, is it needed?
   - pyyaml
   - tifffile
   - ome-zarr
