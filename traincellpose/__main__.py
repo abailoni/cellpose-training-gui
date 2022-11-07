@@ -1,6 +1,16 @@
 import argparse
 import logging
 
+try:
+    from ._version import version as __version__
+except ImportError:  # pragma: no cover
+    __version__ = "not-installed"
+
+__all__ = [
+    "__version__",
+]
+
+
 from traincellpose.core import BaseAnnotationExperiment
 
 def run_GUI(args):
