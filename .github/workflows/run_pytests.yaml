@@ -51,7 +51,6 @@ jobs:
         python -m paquo get_qupath --install-path ./qupath/apps --download-path ./qupath/download ${{ env.QUPATH_VERSION }} | grep -v "^#" | sed "s/^/PAQUO_QUPATH_DIR=/" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
-#        pytest --cov=./paquo --cov-report=xml
         pytest ./tests --doctest-modules --junitxml=junit/test-results.xml --cov=./traincellpose --cov-report=xml --cov-report=html
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
